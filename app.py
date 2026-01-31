@@ -633,6 +633,165 @@ hr {{
     font-weight: 700 !important;
 }}
 
+/* ========== TASK CARDS ========== */
+.task-card {{
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+    padding: var(--space-lg);
+    margin-bottom: var(--space-md);
+    box-shadow: var(--shadow-sm);
+}}
+
+.card-header {{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-md);
+}}
+
+.card-title {{
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}}
+
+/* ========== QUICK ADD BUTTONS ========== */
+.quick-add-grid {{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-sm);
+    margin: var(--space-md) 0;
+}}
+
+/* ========== TOGGLE BUTTONS (for nutrition) ========== */
+.toggle-btn {{
+    min-height: 80px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    font-size: 1rem !important;
+    text-align: center !important;
+}}
+
+.toggle-btn.active {{
+    background: var(--success-bg) !important;
+    border-color: var(--accent-primary) !important;
+    border-width: 3px !important;
+}}
+
+/* ========== WATER GLASSES ========== */
+.glasses-row {{
+    display: flex;
+    justify-content: center;
+    gap: var(--space-md);
+    margin: var(--space-md) 0;
+}}
+
+.glass-btn {{
+    width: 56px !important;
+    height: 56px !important;
+    min-height: 56px !important;
+    border-radius: 50% !important;
+    font-size: 1.5rem !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}}
+
+/* ========== TIME INPUT ========== */
+.stTimeInput > div > div > input {{
+    background: var(--bg-input) !important;
+    color: var(--text-primary) !important;
+    border: 2px solid var(--border-color) !important;
+    border-radius: var(--radius-lg) !important;
+    min-height: var(--touch-comfortable) !important;
+    font-size: 1.25rem !important;
+    padding: 1rem !important;
+    text-align: center !important;
+}}
+
+.stTimeInput > div > div > input:focus {{
+    border-color: var(--accent-primary) !important;
+    box-shadow: 0 0 0 4px var(--accent-glow) !important;
+}}
+
+.stTimeInput > label {{
+    color: var(--text-primary) !important;
+    font-weight: 600 !important;
+    font-size: 0.9375rem !important;
+}}
+
+/* ========== WINDOW METER ========== */
+.window-meter {{
+    background: var(--bg-elevated);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    text-align: center;
+    margin-top: var(--space-md);
+}}
+
+.window-value {{
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--accent-primary);
+}}
+
+.window-label {{
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin-top: var(--space-xs);
+}}
+
+/* ========== NUTRITION GRID ========== */
+.nutrition-grid {{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-sm);
+}}
+
+/* ========== FAT COUNTER ========== */
+.fat-counter {{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-md);
+    padding: var(--space-md);
+    background: var(--bg-elevated);
+    border-radius: var(--radius-lg);
+}}
+
+.fat-value {{
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    min-width: 60px;
+    text-align: center;
+}}
+
+/* ========== COMPACT HEADER ========== */
+.compact-header {{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-md);
+}}
+
+.score-badge {{
+    background: var(--accent-gradient);
+    color: var(--text-on-accent);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-lg);
+    font-weight: 700;
+    font-size: 1.125rem;
+}}
+
 /* ========== MOBILE OPTIMIZATIONS ========== */
 @media (max-width: 480px) {{
     h1 {{ font-size: 1.625rem !important; }}
@@ -872,7 +1031,24 @@ def get_week(w):
 def init_log(data):
     t = today()
     if t not in data["logs"]:
-        data["logs"][t] = {"water": 0, "water_before": 0, "veggies": False, "protein": False, "window": 0, "fats": 0, "treat": False, "slip": False}
+        data["logs"][t] = {
+            "water": 0,
+            "water_before": 0,
+            "veggies": False,
+            "protein": False,
+            "window": 0,
+            "fats": 0,
+            "treat": False,
+            "slip": False,
+            "first_meal": "08:00",
+            "last_meal": "18:00"
+        }
+    # Ensure existing logs have time fields
+    log = data["logs"][t]
+    if "first_meal" not in log:
+        log["first_meal"] = "08:00"
+    if "last_meal" not in log:
+        log["last_meal"] = "18:00"
     return data
 
 def score(log):
@@ -958,176 +1134,231 @@ def main_screen(data):
     sc = score(log)
     st_count = streak(data)
 
-    # Header
-    st.markdown(f"## שלום {s.get('name', '')} 👋")
-    st.caption(f"{w['icon']} {w['title']}")
-
-    # Stats
-    c1, c2, c3 = st.columns(3)
-    c1.metric("ציון", f"{sc}%")
-    c2.metric("רצף", f"{st_count}")
-    c3.metric("יום", f"{day}")
+    # ===== COMPACT HEADER =====
+    col_name, col_score = st.columns([3, 1])
+    with col_name:
+        st.markdown(f"### שלום {s.get('name', '')} 👋")
+        st.caption(f"{w['icon']} יום {day} | {w['title']}")
+    with col_score:
+        st.metric("ציון", f"{sc}%")
 
     st.progress(sc / 100)
 
-    # Tip
-    import random
-    st.info(f"💡 {random.choice(TIPS)}")
-
-    st.markdown("---")
-
-    # Focus
-    st.markdown(f"### 🎯 {w['focus']}")
-
-    st.markdown("---")
-
-    # WATER
+    # ===== CARD 1: HYDRATION =====
     st.markdown("#### 💧 מים")
-    water = st.slider("ליטרים", 0.0, 6.0, float(log.get("water", 0)), 0.5, label_visibility="collapsed")
-    if water != log.get("water"):
-        log["water"] = water
-        save_data(data)
 
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col1:
-        if st.button("➖", key="w-"):
-            log["water_before"] = max(0, log.get("water_before", 0) - 1)
+    # Water amount display
+    water_val = log.get("water", 0)
+    col_amount, col_reset = st.columns([4, 1])
+    with col_amount:
+        st.markdown(f"**{water_val:.1f} ליטר** {'✅' if water_val >= 2 else ''}")
+    with col_reset:
+        if st.button("🔄", key="water_reset", help="איפוס"):
+            log["water"] = 0
             save_data(data)
             st.rerun()
-    with col2:
-        wb = log.get("water_before", 0)
-        st.markdown(f"**לפני ארוחה: {wb}/3** {'✓' if wb >= 3 else ''}")
-    with col3:
-        if st.button("➕", key="w+"):
-            log["water_before"] = min(6, log.get("water_before", 0) + 1)
+
+    # Quick add buttons
+    w1, w2, w3 = st.columns(3)
+    with w1:
+        if st.button("☕ 250ml", key="w250", use_container_width=True):
+            log["water"] = min(6, log.get("water", 0) + 0.25)
+            save_data(data)
+            st.rerun()
+    with w2:
+        if st.button("🥤 500ml", key="w500", use_container_width=True):
+            log["water"] = min(6, log.get("water", 0) + 0.5)
+            save_data(data)
+            st.rerun()
+    with w3:
+        if st.button("🍶 1L", key="w1000", use_container_width=True):
+            log["water"] = min(6, log.get("water", 0) + 1.0)
+            save_data(data)
+            st.rerun()
+
+    # Water before meals - toggle glasses
+    st.markdown("**לפני ארוחות:**")
+    wb = log.get("water_before", 0)
+    g1, g2, g3 = st.columns(3)
+    with g1:
+        icon1 = "🔵" if wb >= 1 else "⚪"
+        if st.button(icon1, key="glass1", use_container_width=True):
+            log["water_before"] = 0 if wb >= 1 and wb < 2 else 1
+            if wb >= 1:
+                log["water_before"] = 0
+            else:
+                log["water_before"] = 1
+            save_data(data)
+            st.rerun()
+    with g2:
+        icon2 = "🔵" if wb >= 2 else "⚪"
+        if st.button(icon2, key="glass2", use_container_width=True):
+            if wb >= 2:
+                log["water_before"] = 1
+            else:
+                log["water_before"] = 2
+            save_data(data)
+            st.rerun()
+    with g3:
+        icon3 = "🔵" if wb >= 3 else "⚪"
+        if st.button(icon3, key="glass3", use_container_width=True):
+            if wb >= 3:
+                log["water_before"] = 2
+            else:
+                log["water_before"] = 3
             save_data(data)
             st.rerun()
 
     st.markdown("---")
 
-    # NUTRITION
+    # ===== CARD 2: NUTRITION GRID =====
     st.markdown("#### 🥗 תזונה")
 
-    veg = st.checkbox("50% ירקות מנקים ב-2 ארוחות", value=log.get("veggies", False))
-    if veg != log.get("veggies"):
-        log["veggies"] = veg
-        save_data(data)
+    # Toggle buttons for veggies and protein
+    n1, n2 = st.columns(2)
+    with n1:
+        veg_active = log.get("veggies", False)
+        veg_icon = "✅" if veg_active else "🥬"
+        veg_style = "primary" if veg_active else "secondary"
+        if st.button(f"{veg_icon}\nירקות 50%", key="veg_toggle", use_container_width=True, type=veg_style):
+            log["veggies"] = not veg_active
+            save_data(data)
+            st.rerun()
+    with n2:
+        prot_active = log.get("protein", False)
+        prot_icon = "✅" if prot_active else "🍗"
+        prot_style = "primary" if prot_active else "secondary"
+        if st.button(f"{prot_icon}\nחלבון", key="prot_toggle", use_container_width=True, type=prot_style):
+            log["protein"] = not prot_active
+            save_data(data)
+            st.rerun()
 
-    prot = st.checkbox("חלבון בכל ארוחה", value=log.get("protein", False))
-    if prot != log.get("protein"):
-        log["protein"] = prot
-        save_data(data)
-
-    with st.expander("רשימת ירקות מנקים"):
-        st.markdown(VEGGIES)
-        st.caption("❌ לא: תפו״א, בטטה, סלק, תירס, קטניות")
-
-    st.markdown("---")
-
-    # TIMING
-    st.markdown("#### ⏰ תזמון")
-    win = st.slider("חלון אכילה (שעות)", 0, 16, log.get("window", 0), label_visibility="collapsed")
-    if win != log.get("window"):
-        log["window"] = win
-        save_data(data)
-
-    if win > 0:
-        if win <= 10:
-            st.success(f"חלון {win} שעות - מצוין")
-        elif win <= 12:
-            st.info(f"חלון {win} שעות - טוב")
-        else:
-            st.warning(f"חלון {win} שעות - נסה לקצר")
-
-    st.markdown("---")
-
-    # FATS
-    st.markdown("#### 🥑 שומנים")
+    # Fats counter in nutrition section
+    st.markdown("**🥑 שומנים:**")
     fc1, fc2, fc3 = st.columns([1, 2, 1])
     with fc1:
-        if st.button("➖", key="f-"):
+        if st.button("➖", key="f-", use_container_width=True):
             log["fats"] = max(0, log.get("fats", 0) - 1)
             save_data(data)
             st.rerun()
     with fc2:
         f = log.get("fats", 0)
-        st.markdown(f"**{f} כפות** {'✓' if f <= 3 else '⚠️'}")
+        status = "✅" if f <= 3 else "⚠️"
+        st.markdown(f"<div style='text-align:center;font-size:1.5rem;font-weight:700;'>{f} כפות {status}</div>", unsafe_allow_html=True)
     with fc3:
-        if st.button("➕", key="f+"):
+        if st.button("➕", key="f+", use_container_width=True):
             log["fats"] = log.get("fats", 0) + 1
             save_data(data)
             st.rerun()
 
-    st.caption("מקסימום 2-3 כפות (שמן, טחינה, אבוקדו)")
+    st.caption("מקסימום 2-3 כפות ביום")
+
+    with st.expander("📋 ירקות מנקים"):
+        st.markdown(VEGGIES)
+        st.caption("❌ לא: תפו״א, בטטה, סלק, תירס, קטניות")
 
     st.markdown("---")
 
-    # WEEKLY RULES
-    st.markdown("#### 📋 הנחיות השבוע")
-    for inst in w["instructions"]:
-        st.markdown(f"• {inst}")
+    # ===== CARD 3: TIMING =====
+    st.markdown("#### ⏰ חלון אכילה")
 
-    with st.expander("✅ מותר"):
+    # Time inputs
+    from datetime import time as dt_time
+
+    # Get saved times or defaults
+    first_meal = log.get("first_meal", "08:00")
+    last_meal = log.get("last_meal", "18:00")
+
+    t1, t2 = st.columns(2)
+    with t1:
+        first_time = st.time_input("ארוחה ראשונה", value=dt_time(int(first_meal.split(":")[0]), int(first_meal.split(":")[1])), key="first_meal_input")
+    with t2:
+        last_time = st.time_input("ארוחה אחרונה", value=dt_time(int(last_meal.split(":")[0]), int(last_meal.split(":")[1])), key="last_meal_input")
+
+    # Calculate window
+    first_minutes = first_time.hour * 60 + first_time.minute
+    last_minutes = last_time.hour * 60 + last_time.minute
+    window_hours = max(0, (last_minutes - first_minutes) / 60)
+
+    # Save times and window
+    new_first = f"{first_time.hour:02d}:{first_time.minute:02d}"
+    new_last = f"{last_time.hour:02d}:{last_time.minute:02d}"
+    if new_first != log.get("first_meal") or new_last != log.get("last_meal"):
+        log["first_meal"] = new_first
+        log["last_meal"] = new_last
+        log["window"] = int(window_hours)
+        save_data(data)
+
+    # Window meter
+    if window_hours > 0:
+        remaining = max(0, 12 - window_hours)
+        progress_val = min(1.0, window_hours / 12)
+
+        if window_hours <= 10:
+            st.success(f"חלון: {window_hours:.1f} שעות - מצוין! 🎯")
+        elif window_hours <= 12:
+            st.info(f"חלון: {window_hours:.1f} שעות - טוב 👍")
+        else:
+            st.warning(f"חלון: {window_hours:.1f} שעות - נסה לקצר ⚠️")
+
+        st.progress(progress_val)
+
+    st.markdown("---")
+
+    # ===== WEEKLY INFO (Collapsible) =====
+    with st.expander(f"📋 הנחיות שבוע {week}"):
+        for inst in w["instructions"]:
+            st.markdown(f"• {inst}")
+        st.markdown("---")
+        st.markdown("**✅ מותר:**")
         st.markdown(w["allowed"])
-
-    with st.expander("🚫 אסור"):
+        st.markdown("**🚫 אסור:**")
         st.markdown(w["forbidden"])
-
-    if w.get("treat"):
-        with st.expander("🎉 פינוק"):
+        if w.get("treat"):
+            st.markdown("**🎉 פינוק:**")
             st.markdown(w["treat"])
 
     # TRACK (week 9+)
     if week >= 9:
-        st.markdown("---")
-        st.markdown("#### 🛤️ מסלול")
         track = s.get("track")
         if not track:
-            track = st.radio("בחר:", list(TRACKS.keys()), format_func=lambda x: f"{TRACKS[x]['icon']} {TRACKS[x]['name']}", horizontal=True)
+            st.markdown("#### 🛤️ בחר מסלול")
+            track = st.radio("", list(TRACKS.keys()), format_func=lambda x: f"{TRACKS[x]['icon']} {TRACKS[x]['name']}", horizontal=True, label_visibility="collapsed")
             if st.button("שמור מסלול"):
                 s["track"] = track
                 save_data(data)
                 st.rerun()
         else:
             t = TRACKS[track]
-            st.markdown(f"**{t['icon']} {t['name']}** | {t['carbs']} | {t['treats']}")
-
-    st.markdown("---")
+            st.info(f"**{t['icon']} {t['name']}** | {t['carbs']} | {t['treats']}")
 
     # TREAT & SLIP
-    treat = st.checkbox("🎉 יום פינוק", value=log.get("treat", False))
-    if treat != log.get("treat"):
-        log["treat"] = treat
-        save_data(data)
-
-    if week >= 3 and not treat:
-        slip = st.checkbox("⚠️ אכלתי אסור", value=log.get("slip", False))
-        if slip != log.get("slip"):
-            log["slip"] = slip
+    treat_col, slip_col = st.columns(2)
+    with treat_col:
+        treat_active = log.get("treat", False)
+        treat_btn = "🎉 יום פינוק ✓" if treat_active else "🎉 יום פינוק"
+        if st.button(treat_btn, key="treat_toggle", use_container_width=True, type="primary" if treat_active else "secondary"):
+            log["treat"] = not treat_active
             save_data(data)
+            st.rerun()
 
-    # RESCUE
+    with slip_col:
+        if week >= 3 and not log.get("treat"):
+            slip_active = log.get("slip", False)
+            slip_btn = "⚠️ החלקה ✓" if slip_active else "⚠️ החלקה"
+            if st.button(slip_btn, key="slip_toggle", use_container_width=True, type="primary" if slip_active else "secondary"):
+                log["slip"] = not slip_active
+                save_data(data)
+                st.rerun()
+
+    # RESCUE (if needed)
     if sc < 60 or log.get("slip"):
-        st.markdown("---")
-        st.warning("🆘 גלגלי הצלה")
-        r1, r2, r3 = st.columns(3)
-        if r1.button("💧 מים"):
-            st.success("הוסף 1-2 ליטר")
-        if r2.button("🥗 ירקות"):
-            st.success("הגדל 50%")
-        if r3.button("⏰ דחייה"):
-            st.success("מחר דחה ארוחה")
+        st.warning("🆘 גלגלי הצלה: הוסף מים, ירקות, או דחה ארוחה מחר")
 
-    # TIPS
-    if w.get("tips"):
-        st.markdown("---")
-        st.markdown("#### 💡 טיפים")
-        for tip in w["tips"]:
-            st.markdown(f"• {tip}")
-
-    # COMPLETE
     st.markdown("---")
-    if st.button("✅ סיום יום"):
+
+    # ===== FINISH DAY BUTTON =====
+    if st.button("✅ סיום יום", use_container_width=True, type="primary"):
         save_data(data)
         if sc >= 80:
             st.balloons()
