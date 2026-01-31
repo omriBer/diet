@@ -1,6 +1,6 @@
 """
 The Leptin Method - שיטת הלפטין
-Modern 2026 UI - Masculine Design
+Mobile-First 2026 UI - Light/Dark Mode
 """
 
 import streamlit as st
@@ -15,413 +15,682 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# ===== 2026 MODERN UI - MASCULINE PALETTE =====
-st.markdown("""
+# ===== THEME STATE =====
+if "theme" not in st.session_state:
+    st.session_state.theme = "light"  # Default to light mode
+
+def get_theme_css():
+    is_dark = st.session_state.theme == "dark"
+
+    if is_dark:
+        # Dark Mode - Masculine Palette
+        colors = """
+        --bg-primary: #0d1117;
+        --bg-secondary: #161b22;
+        --bg-card: #21262d;
+        --bg-elevated: #30363d;
+        --bg-input: #21262d;
+
+        --accent-primary: #00d4aa;
+        --accent-secondary: #00a896;
+        --accent-gradient: linear-gradient(135deg, #00d4aa 0%, #00a896 100%);
+        --accent-glow: rgba(0, 212, 170, 0.25);
+
+        --text-primary: #f0f6fc;
+        --text-secondary: #8b949e;
+        --text-muted: #484f58;
+        --text-on-accent: #0d1117;
+
+        --border-color: rgba(240, 246, 252, 0.1);
+        --border-hover: rgba(0, 212, 170, 0.4);
+
+        --success-bg: rgba(0, 212, 170, 0.12);
+        --warning-bg: rgba(244, 162, 97, 0.12);
+        --error-bg: rgba(248, 81, 73, 0.12);
+        --info-bg: rgba(56, 139, 253, 0.12);
+
+        --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+        --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+        --shadow-lg: 0 8px 24px rgba(0,0,0,0.5);
+        """
+    else:
+        # Light Mode - Clean Masculine Palette
+        colors = """
+        --bg-primary: #ffffff;
+        --bg-secondary: #f6f8fa;
+        --bg-card: #ffffff;
+        --bg-elevated: #f6f8fa;
+        --bg-input: #ffffff;
+
+        --accent-primary: #0891b2;
+        --accent-secondary: #0e7490;
+        --accent-gradient: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
+        --accent-glow: rgba(8, 145, 178, 0.15);
+
+        --text-primary: #1f2937;
+        --text-secondary: #4b5563;
+        --text-muted: #9ca3af;
+        --text-on-accent: #ffffff;
+
+        --border-color: #e5e7eb;
+        --border-hover: rgba(8, 145, 178, 0.5);
+
+        --success-bg: rgba(16, 185, 129, 0.1);
+        --warning-bg: rgba(245, 158, 11, 0.1);
+        --error-bg: rgba(239, 68, 68, 0.1);
+        --info-bg: rgba(59, 130, 246, 0.1);
+
+        --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+        --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+        --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+        """
+
+    return f"""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800&display=swap');
 
-/* === COLOR SYSTEM - Masculine & High Contrast === */
-:root {
-    --bg-primary: #0a0a0f;
-    --bg-secondary: #12121a;
-    --bg-card: #1a1a24;
-    --bg-elevated: #222230;
+/* ========== CSS VARIABLES ========== */
+:root {{
+    {colors}
 
-    --accent-primary: #00d4aa;
-    --accent-secondary: #00a896;
-    --accent-tertiary: #05668d;
+    /* Semantic Colors */
+    --success: #10b981;
+    --warning: #f59e0b;
+    --error: #ef4444;
+    --info: #3b82f6;
 
-    --text-primary: #ffffff;
-    --text-secondary: #a0a0b0;
-    --text-muted: #606070;
+    /* Spacing - Mobile First */
+    --space-xs: 0.25rem;
+    --space-sm: 0.5rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
 
-    --success: #00d4aa;
-    --warning: #f4a261;
-    --error: #ef476f;
-    --info: #118ab2;
+    /* Touch Targets - Extra Large for Mobile */
+    --touch-min: 56px;
+    --touch-comfortable: 64px;
+    --touch-large: 72px;
 
-    --border: rgba(255,255,255,0.08);
-    --shadow: 0 4px 24px rgba(0,0,0,0.4);
-}
+    /* Border Radius */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
 
-/* === GLOBAL === */
-* {
-    font-family: 'Heebo', -apple-system, sans-serif !important;
+    /* Transitions */
+    --transition-fast: 150ms ease;
+    --transition-normal: 200ms ease;
+}}
+
+/* ========== GLOBAL RESET ========== */
+*, *::before, *::after {{
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}}
+
+* {{
+    font-family: 'Heebo', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
     -webkit-font-smoothing: antialiased;
-}
+    -moz-osx-font-smoothing: grayscale;
+}}
 
-.stApp {
-    background: var(--bg-primary);
-    color: var(--text-primary);
-}
+/* ========== APP CONTAINER ========== */
+.stApp {{
+    background: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+}}
 
-[data-testid="stAppViewContainer"] {
-    background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
-}
+[data-testid="stAppViewContainer"] {{
+    background: var(--bg-primary) !important;
+}}
 
-/* RTL */
-.stApp, .stMarkdown, p, span, label, div, h1, h2, h3, h4, h5, h6 {
+[data-testid="stHeader"] {{
+    background: transparent !important;
+}}
+
+/* RTL Support */
+.stApp, .stMarkdown, p, span, label, div, h1, h2, h3, h4, h5, h6 {{
     direction: rtl;
     text-align: right;
-}
+}}
 
-/* Hide Streamlit defaults */
+/* Hide Streamlit Defaults */
 #MainMenu, footer, header, .stDeployButton,
-[data-testid="stToolbar"], [data-testid="stDecoration"] {
+[data-testid="stToolbar"], [data-testid="stDecoration"],
+[data-testid="stStatusWidget"] {{
     display: none !important;
-}
+}}
 
-.block-container {
-    padding: 1rem 1rem 3rem 1rem !important;
+/* Mobile-First Container */
+.block-container {{
+    padding: var(--space-md) var(--space-md) 5rem var(--space-md) !important;
     max-width: 100% !important;
-}
+}}
 
-/* === TYPOGRAPHY === */
-h1, h2, h3 {
-    color: var(--text-primary) !important;
-    font-weight: 700 !important;
-}
+@media (min-width: 768px) {{
+    .block-container {{
+        max-width: 640px !important;
+        margin: 0 auto;
+        padding: var(--space-lg) var(--space-lg) 5rem var(--space-lg) !important;
+    }}
+}}
 
-h2 {
-    font-size: 1.5rem !important;
-    margin-bottom: 0.5rem !important;
-}
-
-h3 {
-    font-size: 1.2rem !important;
-    color: var(--text-secondary) !important;
-}
-
-p, span, label {
-    color: var(--text-secondary);
-    line-height: 1.6;
-}
-
-/* === CARDS === */
-.metric-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 1.25rem;
-    text-align: center;
-}
-
-/* === BUTTONS === */
-.stButton > button {
-    width: 100%;
-    min-height: 52px;
-    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%) !important;
-    color: var(--bg-primary) !important;
-    font-weight: 700 !important;
-    font-size: 1rem !important;
-    border: none !important;
-    border-radius: 12px !important;
-    box-shadow: 0 4px 16px rgba(0, 212, 170, 0.3);
-    transition: all 0.2s ease;
-    text-shadow: none;
-}
-
-.stButton > button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 24px rgba(0, 212, 170, 0.4);
-}
-
-.stButton > button:active {
-    transform: translateY(0);
-}
-
-/* Secondary buttons (in columns) */
-div[data-testid="column"] .stButton > button {
-    background: var(--bg-elevated) !important;
-    color: var(--text-primary) !important;
-    box-shadow: none;
-    border: 1px solid var(--border) !important;
-}
-
-div[data-testid="column"] .stButton > button:hover {
-    background: var(--bg-card) !important;
-    border-color: var(--accent-primary) !important;
-}
-
-/* === INPUTS === */
-.stTextInput > div > div > input,
-.stNumberInput > div > div > input {
-    background: var(--bg-card) !important;
-    color: var(--text-primary) !important;
-    border: 2px solid var(--border) !important;
-    border-radius: 12px !important;
-    padding: 0.875rem 1rem !important;
-    font-size: 1rem !important;
-    min-height: 52px !important;
-}
-
-.stTextInput > div > div > input:focus,
-.stNumberInput > div > div > input:focus {
-    border-color: var(--accent-primary) !important;
-    box-shadow: 0 0 0 3px rgba(0, 212, 170, 0.15) !important;
-}
-
-.stTextInput > div > div > input::placeholder {
-    color: var(--text-muted) !important;
-}
-
-/* === SLIDERS === */
-.stSlider > div > div > div {
-    background: var(--bg-elevated) !important;
-}
-
-.stSlider [data-baseweb="slider"] > div {
-    background: var(--bg-elevated) !important;
-}
-
-.stSlider [data-baseweb="slider"] > div > div {
-    background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary)) !important;
-}
-
-.stSlider [data-baseweb="slider"] [data-testid="stThumbValue"] {
-    color: var(--text-primary) !important;
-    font-weight: 600;
-}
-
-.stSlider [role="slider"] {
-    background: var(--accent-primary) !important;
-    border: 3px solid var(--bg-primary) !important;
-    box-shadow: var(--shadow);
-}
-
-/* === CHECKBOXES === */
-.stCheckbox {
-    padding: 0.25rem 0;
-}
-
-.stCheckbox > label {
-    background: var(--bg-card) !important;
-    border: 2px solid var(--border) !important;
-    border-radius: 12px !important;
-    padding: 1rem 1.25rem !important;
-    margin: 0.25rem 0;
-    min-height: 56px;
-    display: flex !important;
-    align-items: center !important;
-    transition: all 0.2s ease;
-    cursor: pointer;
-}
-
-.stCheckbox > label:hover {
-    border-color: rgba(0, 212, 170, 0.3) !important;
-    background: var(--bg-elevated) !important;
-}
-
-.stCheckbox > label:has(input:checked) {
-    border-color: var(--accent-primary) !important;
-    background: rgba(0, 212, 170, 0.08) !important;
-}
-
-.stCheckbox > label > span {
-    color: var(--text-primary) !important;
-    font-size: 0.95rem;
-}
-
-/* Checkbox icon */
-.stCheckbox [data-testid="stCheckbox"] > div:first-child {
-    background: var(--bg-elevated) !important;
-    border: 2px solid var(--text-muted) !important;
-    border-radius: 6px;
-}
-
-.stCheckbox > label:has(input:checked) [data-testid="stCheckbox"] > div:first-child {
-    background: var(--accent-primary) !important;
-    border-color: var(--accent-primary) !important;
-}
-
-/* === TABS === */
-.stTabs [data-baseweb="tab-list"] {
-    background: var(--bg-card);
-    border-radius: 14px;
-    padding: 6px;
-    gap: 4px;
-    border: 1px solid var(--border);
-}
-
-.stTabs [data-baseweb="tab"] {
-    color: var(--text-muted) !important;
-    font-weight: 500;
-    border-radius: 10px;
-    padding: 0.625rem 0.75rem;
-    font-size: 0.9rem;
-}
-
-.stTabs [data-baseweb="tab"]:hover {
-    color: var(--text-secondary) !important;
-    background: var(--bg-elevated);
-}
-
-.stTabs [aria-selected="true"] {
-    background: var(--accent-primary) !important;
-    color: var(--bg-primary) !important;
-    font-weight: 700 !important;
-}
-
-/* === METRICS === */
-[data-testid="stMetricValue"] {
+/* ========== TYPOGRAPHY ========== */
+h1 {{
     color: var(--text-primary) !important;
     font-size: 1.75rem !important;
-    font-weight: 800 !important;
-}
+    font-weight: 700 !important;
+    margin-bottom: var(--space-sm) !important;
+    line-height: 1.2 !important;
+}}
 
-[data-testid="stMetricLabel"] {
+h2 {{
+    color: var(--text-primary) !important;
+    font-size: 1.375rem !important;
+    font-weight: 700 !important;
+    margin-bottom: var(--space-sm) !important;
+}}
+
+h3 {{
+    color: var(--text-primary) !important;
+    font-size: 1.125rem !important;
+    font-weight: 600 !important;
+    margin-bottom: var(--space-sm) !important;
+}}
+
+h4 {{
+    color: var(--text-secondary) !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+}}
+
+p, span, label {{
+    color: var(--text-secondary) !important;
+    font-size: 0.9375rem !important;
+    line-height: 1.6 !important;
+}}
+
+.stCaption, [data-testid="stCaptionContainer"] {{
     color: var(--text-muted) !important;
-    font-size: 0.8rem !important;
-    font-weight: 500;
-}
+    font-size: 0.8125rem !important;
+}}
 
-div[data-testid="metric-container"] {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 1rem;
-}
-
-/* === PROGRESS BAR === */
-.stProgress > div > div > div {
-    background: var(--bg-elevated) !important;
-    border-radius: 8px;
-}
-
-.stProgress > div > div > div > div {
-    background: linear-gradient(90deg, var(--accent-tertiary), var(--accent-primary)) !important;
-    border-radius: 8px;
-}
-
-/* === EXPANDER === */
-.streamlit-expanderHeader {
-    background: var(--bg-card) !important;
-    border: 1px solid var(--border) !important;
-    border-radius: 12px !important;
-    color: var(--text-primary) !important;
-    font-weight: 600;
-    padding: 0.875rem 1rem;
-}
-
-.streamlit-expanderHeader:hover {
-    border-color: var(--accent-primary) !important;
-}
-
-.streamlit-expanderContent {
-    background: var(--bg-card) !important;
-    border: 1px solid var(--border) !important;
-    border-top: none !important;
-    border-radius: 0 0 12px 12px !important;
-    padding: 1rem;
-}
-
-/* === ALERTS === */
-.stAlert {
-    border-radius: 12px !important;
+/* ========== BUTTONS - LARGE & TOUCH FRIENDLY ========== */
+.stButton > button {{
+    width: 100%;
+    min-height: var(--touch-large);
+    background: var(--accent-gradient) !important;
+    color: var(--text-on-accent) !important;
+    font-weight: 700 !important;
+    font-size: 1.125rem !important;
     border: none !important;
-}
+    border-radius: var(--radius-lg) !important;
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-normal);
+    cursor: pointer;
+    padding: 1rem 1.5rem !important;
+    letter-spacing: 0.01em;
+}}
 
-div[data-baseweb="notification"] {
-    background: var(--bg-card) !important;
-    border: 1px solid var(--border) !important;
-    border-radius: 12px !important;
-}
+.stButton > button:hover {{
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg), 0 0 30px var(--accent-glow);
+}}
 
-.stSuccess {
-    background: rgba(0, 212, 170, 0.1) !important;
-    border-right: 4px solid var(--success) !important;
-}
+.stButton > button:active {{
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+}}
 
-.stInfo {
-    background: rgba(17, 138, 178, 0.1) !important;
-    border-right: 4px solid var(--info) !important;
-}
-
-.stWarning {
-    background: rgba(244, 162, 97, 0.1) !important;
-    border-right: 4px solid var(--warning) !important;
-}
-
-.stError {
-    background: rgba(239, 71, 111, 0.1) !important;
-    border-right: 4px solid var(--error) !important;
-}
-
-/* === DIVIDERS === */
-hr {
-    border: none;
-    height: 1px;
-    background: var(--border);
-    margin: 1.5rem 0;
-}
-
-/* === DATE INPUT === */
-.stDateInput > div > div > input {
+/* Secondary Buttons (in columns) - Still Large */
+div[data-testid="column"] .stButton > button {{
+    min-height: var(--touch-comfortable);
     background: var(--bg-card) !important;
     color: var(--text-primary) !important;
-    border: 2px solid var(--border) !important;
-    border-radius: 12px !important;
-}
+    border: 2px solid var(--border-color) !important;
+    box-shadow: var(--shadow-sm);
+    font-size: 1.25rem !important;
+    font-weight: 600 !important;
+}}
 
-/* === RADIO === */
-.stRadio > div {
-    gap: 0.5rem;
-}
+div[data-testid="column"] .stButton > button:hover {{
+    border-color: var(--accent-primary) !important;
+    background: var(--bg-elevated) !important;
+    box-shadow: var(--shadow-md);
+}}
 
-.stRadio > div > label {
+/* ========== INPUTS - LARGE & CLEAR ========== */
+.stTextInput > div > div > input,
+.stNumberInput > div > div > input {{
+    background: var(--bg-input) !important;
+    color: var(--text-primary) !important;
+    border: 2px solid var(--border-color) !important;
+    border-radius: var(--radius-lg) !important;
+    padding: 1rem 1.25rem !important;
+    font-size: 1.125rem !important;
+    min-height: var(--touch-comfortable) !important;
+    transition: all var(--transition-fast);
+}}
+
+.stTextInput > div > div > input:focus,
+.stNumberInput > div > div > input:focus {{
+    border-color: var(--accent-primary) !important;
+    box-shadow: 0 0 0 4px var(--accent-glow) !important;
+    outline: none !important;
+}}
+
+.stTextInput > div > div > input::placeholder {{
+    color: var(--text-muted) !important;
+    font-size: 1rem !important;
+}}
+
+/* Input Labels - Larger & Clearer */
+.stTextInput > label,
+.stNumberInput > label,
+.stSlider > label,
+.stDateInput > label {{
+    color: var(--text-primary) !important;
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+    margin-bottom: var(--space-sm) !important;
+}}
+
+/* ========== SLIDERS - LARGE THUMB & TRACK ========== */
+.stSlider {{
+    padding: var(--space-md) 0;
+}}
+
+.stSlider > div > div > div {{
+    background: var(--bg-elevated) !important;
+}}
+
+.stSlider [data-baseweb="slider"] > div {{
+    background: var(--bg-elevated) !important;
+    height: 12px !important;
+    border-radius: 6px !important;
+}}
+
+.stSlider [data-baseweb="slider"] > div > div {{
+    background: var(--accent-gradient) !important;
+    height: 12px !important;
+}}
+
+.stSlider [role="slider"] {{
+    background: var(--accent-primary) !important;
+    border: 4px solid var(--bg-primary) !important;
+    box-shadow: var(--shadow-lg);
+    width: 36px !important;
+    height: 36px !important;
+    top: -12px !important;
+}}
+
+.stSlider [data-baseweb="slider"] [data-testid="stThumbValue"] {{
+    color: var(--text-primary) !important;
+    font-weight: 700 !important;
+    font-size: 1rem !important;
+}}
+
+/* ========== CHECKBOXES - LARGE TOUCH TARGETS ========== */
+.stCheckbox {{
+    padding: var(--space-sm) 0;
+}}
+
+.stCheckbox > label {{
     background: var(--bg-card) !important;
-    border: 2px solid var(--border) !important;
-    border-radius: 12px !important;
+    border: 2px solid var(--border-color) !important;
+    border-radius: var(--radius-lg) !important;
+    padding: 1.25rem var(--space-lg) !important;
+    min-height: var(--touch-large);
+    display: flex !important;
+    align-items: center !important;
+    transition: all var(--transition-fast);
+    cursor: pointer;
+    margin: var(--space-sm) 0;
+    gap: var(--space-md);
+}}
+
+.stCheckbox > label:hover {{
+    border-color: var(--border-hover) !important;
+    background: var(--bg-elevated) !important;
+    transform: translateX(-2px);
+}}
+
+.stCheckbox > label:has(input:checked) {{
+    border-color: var(--accent-primary) !important;
+    background: var(--success-bg) !important;
+    border-width: 3px;
+}}
+
+.stCheckbox > label > span {{
+    color: var(--text-primary) !important;
+    font-size: 1.0625rem !important;
+    font-weight: 500 !important;
+    line-height: 1.4;
+}}
+
+/* Checkbox Icon - Larger */
+.stCheckbox [data-testid="stCheckbox"] > div:first-child {{
+    background: var(--bg-elevated) !important;
+    border: 2px solid var(--text-muted) !important;
+    border-radius: 8px !important;
+    transition: all var(--transition-fast);
+    min-width: 28px !important;
+    min-height: 28px !important;
+}}
+
+.stCheckbox > label:has(input:checked) [data-testid="stCheckbox"] > div:first-child {{
+    background: var(--accent-primary) !important;
+    border-color: var(--accent-primary) !important;
+}}
+
+/* ========== TABS - LARGE & EASY TO TAP ========== */
+.stTabs [data-baseweb="tab-list"] {{
+    background: var(--bg-card);
+    border-radius: var(--radius-xl);
+    padding: 8px;
+    gap: 6px;
+    border: 1px solid var(--border-color);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}}
+
+.stTabs [data-baseweb="tab"] {{
+    color: var(--text-muted) !important;
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+    border-radius: var(--radius-md) !important;
     padding: 0.875rem 1rem !important;
+    min-height: var(--touch-min);
+    white-space: nowrap;
+    transition: all var(--transition-fast);
+}}
+
+.stTabs [data-baseweb="tab"]:hover {{
+    color: var(--text-secondary) !important;
+    background: var(--bg-elevated) !important;
+}}
+
+.stTabs [aria-selected="true"] {{
+    background: var(--accent-gradient) !important;
+    color: var(--text-on-accent) !important;
+    font-weight: 700 !important;
+    box-shadow: var(--shadow-sm);
+}}
+
+.stTabs [data-baseweb="tab-highlight"],
+.stTabs [data-baseweb="tab-border"] {{
+    display: none !important;
+}}
+
+/* ========== METRICS - LARGE & PROMINENT ========== */
+[data-testid="stMetricValue"] {{
     color: var(--text-primary) !important;
-    transition: all 0.2s ease;
-}
+    font-size: 2rem !important;
+    font-weight: 800 !important;
+    line-height: 1.2;
+}}
 
-.stRadio > div > label:hover {
+[data-testid="stMetricLabel"] {{
+    color: var(--text-muted) !important;
+    font-size: 0.875rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}}
+
+div[data-testid="metric-container"] {{
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg) var(--space-md);
+    text-align: center;
+}}
+
+/* ========== PROGRESS BAR - THICK & VISIBLE ========== */
+.stProgress {{
+    margin: var(--space-md) 0;
+}}
+
+.stProgress > div > div > div {{
+    background: var(--bg-elevated) !important;
+    border-radius: 10px !important;
+    height: 16px !important;
+}}
+
+.stProgress > div > div > div > div {{
+    background: var(--accent-gradient) !important;
+    border-radius: 10px !important;
+}}
+
+/* ========== EXPANDER - LARGE TOUCH TARGET ========== */
+.streamlit-expanderHeader {{
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius-lg) !important;
+    color: var(--text-primary) !important;
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+    padding: 1.125rem var(--space-lg) !important;
+    min-height: var(--touch-comfortable);
+    transition: all var(--transition-fast);
+}}
+
+.streamlit-expanderHeader:hover {{
+    border-color: var(--border-hover) !important;
+    background: var(--bg-elevated) !important;
+}}
+
+.streamlit-expanderContent {{
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    border-top: none !important;
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg) !important;
+    padding: var(--space-lg) !important;
+    font-size: 1rem !important;
+}}
+
+[data-testid="stExpander"] details {{
+    border: none !important;
+}}
+
+/* ========== ALERTS ========== */
+.stAlert, [data-testid="stAlert"] {{
+    border-radius: var(--radius-md) !important;
+    border: none !important;
+    padding: var(--space-md) !important;
+}}
+
+.stSuccess, [data-testid="stAlert"][data-baseweb*="positive"] {{
+    background: var(--success-bg) !important;
+    border-right: 4px solid var(--success) !important;
+}}
+
+.stInfo, [data-testid="stAlert"][data-baseweb*="info"] {{
+    background: var(--info-bg) !important;
+    border-right: 4px solid var(--info) !important;
+}}
+
+.stWarning, [data-testid="stAlert"][data-baseweb*="warning"] {{
+    background: var(--warning-bg) !important;
+    border-right: 4px solid var(--warning) !important;
+}}
+
+.stError, [data-testid="stAlert"][data-baseweb*="negative"] {{
+    background: var(--error-bg) !important;
+    border-right: 4px solid var(--error) !important;
+}}
+
+/* ========== DATE INPUT - LARGE ========== */
+.stDateInput > div > div > input {{
+    background: var(--bg-input) !important;
+    color: var(--text-primary) !important;
+    border: 2px solid var(--border-color) !important;
+    border-radius: var(--radius-lg) !important;
+    min-height: var(--touch-comfortable) !important;
+    font-size: 1.125rem !important;
+    padding: 1rem !important;
+}}
+
+.stDateInput > div > div > input:focus {{
     border-color: var(--accent-primary) !important;
-}
+    box-shadow: 0 0 0 4px var(--accent-glow) !important;
+}}
 
-.stRadio > div > label[data-checked="true"] {
+/* ========== RADIO - LARGE TOUCH TARGETS ========== */
+.stRadio > div {{
+    gap: var(--space-md);
+}}
+
+.stRadio > div > label {{
+    background: var(--bg-card) !important;
+    border: 2px solid var(--border-color) !important;
+    border-radius: var(--radius-lg) !important;
+    padding: 1.125rem var(--space-lg) !important;
+    color: var(--text-primary) !important;
+    min-height: var(--touch-comfortable);
+    font-size: 1rem !important;
+    font-weight: 500 !important;
+    transition: all var(--transition-fast);
+    cursor: pointer;
+}}
+
+.stRadio > div > label:hover {{
+    border-color: var(--border-hover) !important;
+    background: var(--bg-elevated) !important;
+    transform: translateX(-2px);
+}}
+
+.stRadio > div > label[data-checked="true"] {{
     border-color: var(--accent-primary) !important;
-    background: rgba(0, 212, 170, 0.08) !important;
-}
+    background: var(--success-bg) !important;
+    border-width: 3px;
+}}
 
-/* === CUSTOM CLASSES === */
-.section-title {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin: 1rem 0 0.75rem 0;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
+/* ========== DIVIDERS ========== */
+hr {{
+    border: none !important;
+    height: 1px !important;
+    background: var(--border-color) !important;
+    margin: var(--space-lg) 0 !important;
+}}
 
-.stat-highlight {
-    color: var(--accent-primary);
-    font-weight: 800;
-}
-
-/* === SCROLLBAR === */
-::-webkit-scrollbar {
+/* ========== SCROLLBAR ========== */
+::-webkit-scrollbar {{
     width: 6px;
     height: 6px;
-}
+}}
 
-::-webkit-scrollbar-track {
+::-webkit-scrollbar-track {{
     background: var(--bg-secondary);
-}
+}}
 
-::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb {{
     background: var(--bg-elevated);
     border-radius: 3px;
-}
+}}
 
-::-webkit-scrollbar-thumb:hover {
+::-webkit-scrollbar-thumb:hover {{
     background: var(--text-muted);
-}
+}}
+
+/* ========== THEME TOGGLE BUTTON ========== */
+.theme-toggle {{
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 999999;
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius-lg) !important;
+    padding: 8px 12px !important;
+    color: var(--text-primary) !important;
+    font-size: 1.25rem;
+    cursor: pointer;
+    box-shadow: var(--shadow-md);
+    transition: all var(--transition-fast);
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}}
+
+.theme-toggle:hover {{
+    transform: scale(1.05);
+    box-shadow: var(--shadow-lg);
+}}
+
+/* ========== CUSTOM UTILITY CLASSES ========== */
+.zone-header {{
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-md);
+}}
+
+.stat-accent {{
+    color: var(--accent-primary) !important;
+    font-weight: 700 !important;
+}}
+
+/* ========== MOBILE OPTIMIZATIONS ========== */
+@media (max-width: 480px) {{
+    h1 {{ font-size: 1.625rem !important; }}
+    h2 {{ font-size: 1.375rem !important; }}
+    h3 {{ font-size: 1.125rem !important; }}
+
+    .stButton > button {{
+        min-height: var(--touch-comfortable);
+        font-size: 1rem !important;
+        padding: 0.875rem 1rem !important;
+    }}
+
+    div[data-testid="column"] {{
+        padding: 0 4px !important;
+    }}
+
+    div[data-testid="column"] .stButton > button {{
+        min-height: var(--touch-min);
+        font-size: 1.125rem !important;
+        padding: 0.75rem !important;
+    }}
+
+    [data-testid="stMetricValue"] {{
+        font-size: 1.5rem !important;
+    }}
+
+    .stCheckbox > label {{
+        padding: 1rem !important;
+    }}
+
+    .stTabs [data-baseweb="tab"] {{
+        padding: 0.75rem 0.875rem !important;
+        font-size: 0.9375rem !important;
+    }}
+}}
+
+/* Extra small screens */
+@media (max-width: 360px) {{
+    .block-container {{
+        padding: var(--space-sm) var(--space-sm) 5rem var(--space-sm) !important;
+    }}
+
+    .stButton > button {{
+        font-size: 0.9375rem !important;
+    }}
+}}
+
+/* ========== SAFE AREA (iOS) ========== */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {{
+    .block-container {{
+        padding-bottom: calc(5rem + env(safe-area-inset-bottom)) !important;
+    }}
+}}
 </style>
-""", unsafe_allow_html=True)
+"""
+
+# Apply theme CSS
+st.markdown(get_theme_css(), unsafe_allow_html=True)
 
 # ===== KNOWLEDGE BASE =====
 WEEK_DATA = {
@@ -539,14 +808,14 @@ def load_data():
         token = st.secrets.get("GITHUB_TOKEN", "")
         gist_id = st.secrets.get("GIST_ID", "")
         if not token or not gist_id:
-            return {"settings": {"start_date": None, "track": None, "name": ""}, "logs": {}}
+            return {"settings": {"start_date": None, "track": None, "name": "", "theme": "light"}, "logs": {}}
         headers = {"Authorization": f"token {token}"}
         r = requests.get(f"https://api.github.com/gists/{gist_id}", headers=headers, timeout=10)
         if r.ok and "leptin_data.json" in r.json().get("files", {}):
             return json.loads(r.json()["files"]["leptin_data.json"]["content"])
     except:
         pass
-    return {"settings": {"start_date": None, "track": None, "name": ""}, "logs": {}}
+    return {"settings": {"start_date": None, "track": None, "name": "", "theme": "light"}, "logs": {}}
 
 def save_data(data):
     try:
@@ -626,6 +895,18 @@ def auth():
             st.error("סיסמה שגויה")
     return False
 
+# ===== THEME TOGGLE =====
+def render_theme_toggle():
+    icon = "🌙" if st.session_state.theme == "light" else "☀️"
+    col1, col2, col3 = st.columns([1, 6, 1])
+    with col1:
+        if st.button(icon, key="theme_toggle", help="החלף ערכת נושא"):
+            st.session_state.theme = "dark" if st.session_state.theme == "light" else "light"
+            if "data" in st.session_state:
+                st.session_state.data["settings"]["theme"] = st.session_state.theme
+                save_data(st.session_state.data)
+            st.rerun()
+
 # ===== SCREENS =====
 def onboarding(data):
     st.markdown("## ⚡ שיטת הלפטין")
@@ -642,6 +923,7 @@ def onboarding(data):
     if st.button("🚀 להתחיל"):
         data["settings"]["name"] = name or "אלוף"
         data["settings"]["start_date"] = start.strftime("%Y-%m-%d")
+        data["settings"]["theme"] = st.session_state.theme
         save_data(data)
         st.session_state.data = data
         st.rerun()
@@ -749,7 +1031,6 @@ def main_screen(data):
             st.rerun()
     with fc2:
         f = log.get("fats", 0)
-        color = "stat-highlight" if f <= 3 else ""
         st.markdown(f"**{f} כפות** {'✓' if f <= 3 else '⚠️'}")
     with fc3:
         if st.button("➕", key="f+"):
@@ -887,6 +1168,24 @@ def info_screen():
 def settings_screen(data):
     st.markdown("## ⚙️ הגדרות")
 
+    # Theme toggle at top of settings
+    st.markdown("### 🎨 ערכת נושא")
+    theme_col1, theme_col2 = st.columns(2)
+    with theme_col1:
+        if st.button("☀️ בהיר", use_container_width=True, type="primary" if st.session_state.theme == "light" else "secondary"):
+            st.session_state.theme = "light"
+            data["settings"]["theme"] = "light"
+            save_data(data)
+            st.rerun()
+    with theme_col2:
+        if st.button("🌙 כהה", use_container_width=True, type="primary" if st.session_state.theme == "dark" else "secondary"):
+            st.session_state.theme = "dark"
+            data["settings"]["theme"] = "dark"
+            save_data(data)
+            st.rerun()
+
+    st.markdown("---")
+
     s = data["settings"]
     day, week = calc_day_week(s.get("start_date", today()))
 
@@ -925,12 +1224,20 @@ def main():
 
     if "data" not in st.session_state:
         st.session_state.data = load_data()
+        # Sync theme from saved data
+        saved_theme = st.session_state.data.get("settings", {}).get("theme", "light")
+        if saved_theme != st.session_state.theme:
+            st.session_state.theme = saved_theme
+            st.rerun()
 
     data = st.session_state.data
 
     if not data["settings"].get("start_date"):
+        render_theme_toggle()
         onboarding(data)
         return
+
+    render_theme_toggle()
 
     tabs = st.tabs(["📊 היום", "📅 היסטוריה", "📚 מידע", "⚙️"])
 
