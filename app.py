@@ -803,28 +803,48 @@ TIPS = [
 ]
 
 # ===== STORAGE =====
+DEFAULT_DATA = {
+    "settings": {"start_date": None, "track": None, "name": "", "theme": "light"},
+    "logs": {}
+}
+
 def load_data():
+    """Load data from GitHub Gist with robust error handling."""
     try:
         token = st.secrets.get("GITHUB_TOKEN", "")
         gist_id = st.secrets.get("GIST_ID", "")
         if not token or not gist_id:
-            return {"settings": {"start_date": None, "track": None, "name": "", "theme": "light"}, "logs": {}}
+            return DEFAULT_DATA.copy()
         headers = {"Authorization": f"token {token}"}
         r = requests.get(f"https://api.github.com/gists/{gist_id}", headers=headers, timeout=10)
-        if r.ok and "leptin_data.json" in r.json().get("files", {}):
-            return json.loads(r.json()["files"]["leptin_data.json"]["content"])
-    except:
+        if r.ok:
+            gist_data = r.json()
+            if "files" in gist_data and "leptin_data.json" in gist_data["files"]:
+                content = gist_data["files"]["leptin_data.json"].get("content", "")
+                if content and isinstance(content, str):
+                    parsed = json.loads(content)
+                    # Ensure data structure is valid
+                    if isinstance(parsed, dict) and "settings" in parsed and "logs" in parsed:
+                        # Ensure theme exists
+                        if "theme" not in parsed["settings"]:
+                            parsed["settings"]["theme"] = "light"
+                        return parsed
+    except (json.JSONDecodeError, requests.RequestException, KeyError, TypeError):
         pass
-    return {"settings": {"start_date": None, "track": None, "name": "", "theme": "light"}, "logs": {}}
+    return DEFAULT_DATA.copy()
 
 def save_data(data):
+    """Save data to GitHub Gist with validation."""
+    if not isinstance(data, dict):
+        return
     try:
         token = st.secrets.get("GITHUB_TOKEN", "")
         gist_id = st.secrets.get("GIST_ID", "")
         if not token:
             return
         headers = {"Authorization": f"token {token}"}
-        payload = {"files": {"leptin_data.json": {"content": json.dumps(data, ensure_ascii=False)}}}
+        content = json.dumps(data, ensure_ascii=False, default=str)
+        payload = {"files": {"leptin_data.json": {"content": content}}}
         if gist_id:
             requests.patch(f"https://api.github.com/gists/{gist_id}", headers=headers, json=payload, timeout=10)
         else:
@@ -832,7 +852,7 @@ def save_data(data):
             r = requests.post("https://api.github.com/gists", headers=headers, json=payload, timeout=10)
             if r.status_code == 201:
                 st.toast(f"GIST_ID: {r.json()['id']}")
-    except:
+    except (requests.RequestException, TypeError, ValueError):
         pass
 
 # ===== HELPERS =====
