@@ -1,91 +1,121 @@
 # 💧 שיטת הלפטין - The Leptin Method Tracker
 
 אפליקציית מעקב יומי לתוכנית הרזיה בשיטת הלפטין.
+**מוגנת בסיסמה + שמירת נתונים בענן!**
 
-A Hebrew, mobile-friendly daily tracking app for "The Leptin Method" weight loss program.
+---
 
-## Features / תכונות
+## 🚀 הפעלה מהירה (3 שלבים)
 
-### 📊 מעקב יומי
-- **💧 הצפת לפטין** - מעקב מים (2-4 ליטר ביום) + כפתור "2 כוסות לפני ארוחה"
-- **🥗 ירקות וחלבון** - מעקב אחר 50% ירקות מנקים וחלבון בכל ארוחה
-- **⏰ חלון אכילה** - מעקב 8-12 שעות
-- **🥑 שומנים מרוכזים** - מגבלה של 2-3 כפות ביום
+### שלב 1: צור GitHub Token
 
-### 🛤️ לוגיקה דינמית לפי שבוע
-- **שבועות 1-2 (ההצפה)** - התמקדות במים וירקות בלבד
-- **שבועות 3-7 (הניקוי)** - ללא סוכר, קמח ומזון מעובד
-- **שבועות 9-12 (המסלולים)** - בחירה בין מסלול מהיר/ניקוי/מתון
+1. היכנס ל-GitHub ולחץ על התמונה שלך (פינה ימנית עליונה)
+2. לחץ **Settings** → **Developer settings** → **Personal access tokens** → **Tokens (classic)**
+3. לחץ **Generate new token (classic)**
+4. תן שם (למשל "leptin-app")
+5. סמן את ה-scope: **gist**
+6. לחץ **Generate token**
+7. **העתק את ה-Token!** (לא תוכל לראות אותו שוב)
 
-### 🆘 תכונות מיוחדות
-- **גלגלי הצלה** - פרוטוקול חירום להתאוששות
-- **יום פינוק** - מצב מיוחד עם כללים מותאמים
-- **היסטוריה** - צפייה ב-14 ימים אחרונים
-- **שמירה אוטומטית** - כל הנתונים נשמרים מקומית
+### שלב 2: הפעל את האפליקציה ב-Streamlit Cloud
 
-## Installation / התקנה
+1. היכנס ל-[share.streamlit.io](https://share.streamlit.io) עם חשבון GitHub
+2. לחץ **New app**
+3. בחר את ה-Repository: `omriBer/diet`
+4. Branch: `claude/leptin-tracking-app-h7HEr` (או `main` אם מוזג)
+5. Main file path: `app.py`
+6. לחץ **Deploy!**
+
+### שלב 3: הגדר סודות (Secrets)
+
+1. באפליקציה ב-Streamlit Cloud, לחץ **⋮** → **Settings**
+2. לחץ על **Secrets**
+3. הדבק את הקוד הבא (עם הערכים שלך):
+
+```toml
+PASSWORD = "הסיסמה_שלך_כאן"
+GITHUB_TOKEN = "ghp_xxxxxxxxxxxx"
+GIST_ID = ""
+```
+
+4. לחץ **Save**
+
+**הערה לגבי GIST_ID:** בהרצה הראשונה, האפליקציה תיצור Gist חדש ותציג לך את ה-ID. העתק אותו והוסף אותו ל-Secrets.
+
+---
+
+## 📱 גישה מהנייד
+
+אחרי ההפעלה, תקבל קישור קבוע כמו:
+```
+https://your-app-name.streamlit.app
+```
+
+שמור את הקישור ב-Home Screen של הנייד לגישה מהירה!
+
+---
+
+## 🔐 אבטחה
+
+- **סיסמה:** רק מי שיודע את הסיסמה יכול להיכנס
+- **נתונים פרטיים:** הנתונים נשמרים ב-GitHub Gist פרטי (רק אתה רואה)
+- **Token מאובטח:** ה-Token נשמר בצורה מוצפנת ב-Streamlit Cloud
+
+---
+
+## ✨ תכונות
+
+### מעקב יומי
+- 💧 **הצפת לפטין** - מעקב מים + כפתור "2 כוסות לפני ארוחה"
+- 🥗 **ירקות וחלבון** - 50% ירקות מנקים + חלבון בכל ארוחה
+- ⏰ **חלון אכילה** - מעקב 8-12 שעות
+- 🥑 **שומנים** - מגבלה של 2-3 כפות ביום
+
+### לוגיקה לפי שבוע
+- **שבועות 1-2 (ההצפה)** - מים וירקות בלבד
+- **שבועות 3-7 (הניקוי)** - ללא סוכר/קמח/מעובד
+- **שבועות 9-12 (המסלולים)** - בחירת מסלול
+
+### תכונות מיוחדות
+- 🆘 **גלגלי הצלה** - פרוטוקול חירום
+- 🎉 **יום פינוק** - מצב מיוחד
+- 📅 **היסטוריה** - צפייה ב-14 ימים אחרונים
+- ☁️ **סנכרון ענן** - הנתונים נשמרים אוטומטית
+
+---
+
+## 🛠️ פיתוח מקומי (אופציונלי)
 
 ```bash
-# Clone the repository
-git clone <repository-url>
+# Clone
+git clone https://github.com/omriBer/diet.git
 cd diet
 
-# Install dependencies
+# Install
 pip install -r requirements.txt
 
-# Run the app
+# Create .streamlit/secrets.toml
+mkdir -p .streamlit
+cat > .streamlit/secrets.toml << EOF
+PASSWORD = "test123"
+GITHUB_TOKEN = "ghp_your_token"
+GIST_ID = ""
+EOF
+
+# Run
 streamlit run app.py
 ```
 
-## Running on Mobile / הרצה בנייד
+---
 
-### Option 1: Local Network (Same WiFi)
-```bash
-# Run with network access
-streamlit run app.py --server.address 0.0.0.0 --server.port 8501
+## 📝 רשימת ירקות מנקים
 
-# Find your computer's IP address:
-# On Linux/Mac: hostname -I
-# On Windows: ipconfig
+מלפפון, עגבנייה, בצל, פטריות, כרובית, כרוב, ברוקולי, שעועית ירוקה, קישוא, חסה, תרד
 
-# Open on mobile: http://YOUR_IP:8501
-```
+**לא נכללים:** תפוח אדמה, בטטה
 
-### Option 2: Streamlit Cloud (Free Hosting)
-1. Push to GitHub
-2. Go to [share.streamlit.io](https://share.streamlit.io)
-3. Connect your repo
-4. Access from anywhere!
+---
 
-### Option 3: Using ngrok (Temporary Public URL)
-```bash
-# Install ngrok
-pip install pyngrok
-
-# Run streamlit
-streamlit run app.py &
-
-# Create tunnel
-ngrok http 8501
-```
-
-## Usage / שימוש
-
-1. **הגדרה ראשונית** - בחר שבוע נוכחי ומסלול (אם רלוונטי)
-2. **מעקב יומי** - רשום צריכת מים, ירקות, חלבון וחלון אכילה
-3. **סיום יום** - לחץ "סיים יום" לקבלת סיכום
-4. **היסטוריה** - צפה בהתקדמות שלך
-
-## Data Storage / אחסון נתונים
-
-הנתונים נשמרים בקובץ `leptin_data.json` בתיקיית האפליקציה.
-
-## Tech Stack
-
-- **Python 3.8+**
-- **Streamlit** - Web framework
-- **JSON** - Local data persistence
-
-## License
+## 📄 License
 
 MIT

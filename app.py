@@ -1,13 +1,13 @@
 """
 The Leptin Method - שיטת הלפטין
 Hebrew Weight Loss Tracking Application
+Cloud-ready with password protection and GitHub Gist storage
 """
 
 import streamlit as st
 import json
-import os
+import requests
 from datetime import datetime, timedelta
-from pathlib import Path
 
 # Page config
 st.set_page_config(
@@ -22,6 +22,12 @@ st.markdown("""
 <style>
     /* RTL Support */
     .stApp, .stMarkdown, .stText, div[data-testid="stMarkdownContainer"] {
+        direction: rtl;
+        text-align: right;
+    }
+
+    /* Fix input fields for RTL */
+    input, textarea, .stTextInput input, .stNumberInput input {
         direction: rtl;
         text-align: right;
     }
@@ -41,29 +47,6 @@ st.markdown("""
         margin: 0.25rem 0;
     }
 
-    /* Success button style */
-    .success-btn > button {
-        background-color: #28a745 !important;
-        color: white !important;
-    }
-
-    /* Water button styling */
-    .water-btn > button {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        font-size: 1.2rem;
-        padding: 1rem;
-    }
-
-    /* Card styling */
-    .tracking-card {
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-        padding: 1.5rem;
-        border-radius: 15px;
-        margin: 1rem 0;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-
     /* Header styling */
     .main-header {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -72,21 +55,6 @@ st.markdown("""
         border-radius: 15px;
         text-align: center;
         margin-bottom: 1.5rem;
-    }
-
-    /* Progress styling */
-    .stProgress > div > div {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-
-    /* Metric cards */
-    .metric-card {
-        background: white;
-        padding: 1rem;
-        border-radius: 10px;
-        text-align: center;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        margin: 0.5rem 0;
     }
 
     /* Week badge */
@@ -99,9 +67,14 @@ st.markdown("""
         display: inline-block;
     }
 
-    /* Checkbox styling */
-    .stCheckbox {
-        padding: 0.5rem 0;
+    /* Metric card */
+    .metric-card {
+        background: white;
+        padding: 1rem;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin: 0.5rem 0;
     }
 
     /* Info boxes */
@@ -129,42 +102,111 @@ st.markdown("""
         margin: 0.5rem 0;
     }
 
-    /* Hide Streamlit branding for cleaner mobile look */
+    /* Login container */
+    .login-container {
+        max-width: 400px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    /* Hide Streamlit branding */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
-
-    /* Expander styling */
-    .streamlit-expanderHeader {
-        font-size: 1.1rem;
-        font-weight: bold;
-    }
 </style>
 """, unsafe_allow_html=True)
 
-# Data file path
-DATA_FILE = Path("leptin_data.json")
+# ===== GITHUB GIST STORAGE =====
 
-# Valid cleaning vegetables
-CLEANING_VEGGIES = [
-    "מלפפון", "עגבנייה", "בצל", "פטריות", "כרובית",
-    "כרוב", "ברוקולי", "שעועית ירוקה", "קישוא", "חסה", "תרד"
-]
+def get_gist_data():
+    """Load data from GitHub Gist"""
+    try:
+        token = st.secrets.get("GITHUB_TOKEN", "")
+        gist_id = st.secrets.get("GIST_ID", "")
 
-# Forbidden foods by phase
-FORBIDDEN_CLEANSE = [
-    "סוכר", "דבש", "סילאן", "אגבה", "קמח לבן", "קמח מלא",
-    "פסטה", "אורז", "תירס", "תפוחי אדמה"
-]
+        if not token or not gist_id:
+            return get_default_data()
 
-# Allowed Leptin carbs
-LEPTIN_CARBS = ["עדשים", "חומוס", "שעועית", "קינואה", "כוסמת"]
+        headers = {
+            "Authorization": f"token {token}",
+            "Accept": "application/vnd.github.v3+json"
+        }
+
+        response = requests.get(
+            f"https://api.github.com/gists/{gist_id}",
+            headers=headers,
+            timeout=10
+        )
+
+        if response.status_code == 200:
+            gist = response.json()
+            if "leptin_data.json" in gist["files"]:
+                content = gist["files"]["leptin_data.json"]["content"]
+                return json.loads(content)
+
+        return get_default_data()
+
+    except Exception as e:
+        st.error(f"שגיאה בטעינת נתונים: {e}")
+        return get_default_data()
 
 
-def load_data():
-    """Load user data from JSON file"""
-    if DATA_FILE.exists():
-        with open(DATA_FILE, "r", encoding="utf-8") as f:
-            return json.load(f)
+def save_gist_data(data):
+    """Save data to GitHub Gist"""
+    try:
+        token = st.secrets.get("GITHUB_TOKEN", "")
+        gist_id = st.secrets.get("GIST_ID", "")
+
+        if not token:
+            st.warning("לא הוגדר GitHub Token - הנתונים לא יישמרו")
+            return False
+
+        headers = {
+            "Authorization": f"token {token}",
+            "Accept": "application/vnd.github.v3+json"
+        }
+
+        payload = {
+            "description": "Leptin Method Tracker Data",
+            "files": {
+                "leptin_data.json": {
+                    "content": json.dumps(data, ensure_ascii=False, indent=2)
+                }
+            }
+        }
+
+        if gist_id:
+            # Update existing gist
+            response = requests.patch(
+                f"https://api.github.com/gists/{gist_id}",
+                headers=headers,
+                json=payload,
+                timeout=10
+            )
+        else:
+            # Create new gist (private)
+            payload["public"] = False
+            response = requests.post(
+                "https://api.github.com/gists",
+                headers=headers,
+                json=payload,
+                timeout=10
+            )
+            if response.status_code == 201:
+                new_gist_id = response.json()["id"]
+                st.info(f"נוצר Gist חדש! העתק את ה-ID להגדרות: {new_gist_id}")
+
+        return response.status_code in [200, 201]
+
+    except Exception as e:
+        st.error(f"שגיאה בשמירת נתונים: {e}")
+        return False
+
+
+def get_default_data():
+    """Return default data structure"""
     return {
         "user_settings": {
             "current_week": 1,
@@ -175,10 +217,55 @@ def load_data():
     }
 
 
-def save_data(data):
-    """Save user data to JSON file"""
-    with open(DATA_FILE, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+# ===== AUTHENTICATION =====
+
+def check_password():
+    """Simple password protection"""
+
+    if "authenticated" not in st.session_state:
+        st.session_state.authenticated = False
+
+    if st.session_state.authenticated:
+        return True
+
+    st.markdown("""
+    <div class="main-header">
+        <h1>💧 שיטת הלפטין</h1>
+        <p>אפליקציית מעקב אישית</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("### 🔐 התחברות")
+
+    password = st.text_input("סיסמה", type="password", key="password_input")
+
+    if st.button("כניסה", use_container_width=True):
+        correct_password = st.secrets.get("PASSWORD", "leptin2024")
+
+        if password == correct_password:
+            st.session_state.authenticated = True
+            st.rerun()
+        else:
+            st.error("סיסמה שגויה")
+
+    st.markdown("---")
+    st.markdown("""
+    <div style="text-align: center; color: #666; font-size: 0.8rem;">
+        💧 הצפת לפטין | התקדמות, לא שלמות
+    </div>
+    """, unsafe_allow_html=True)
+
+    return False
+
+
+# ===== HELPER FUNCTIONS =====
+
+CLEANING_VEGGIES = [
+    "מלפפון", "עגבנייה", "בצל", "פטריות", "כרובית",
+    "כרוב", "ברוקולי", "שעועית ירוקה", "קישוא", "חסה", "תרד"
+]
+
+LEPTIN_CARBS = ["עדשים", "חומוס", "שעועית", "קינואה", "כוסמת"]
 
 
 def get_today_key():
@@ -189,13 +276,13 @@ def get_today_key():
 def get_phase(week):
     """Determine the current phase based on week number"""
     if week <= 2:
-        return "flood"  # The Flood - שלב ההצפה
+        return "flood"
     elif week <= 7:
-        return "cleanse"  # The Cleanse - שלב הניקוי
+        return "cleanse"
     elif week == 8:
-        return "transition"  # Transition week
+        return "transition"
     else:
-        return "tracks"  # The Tracks - שלב המסלולים
+        return "tracks"
 
 
 def get_phase_name(phase):
@@ -228,7 +315,6 @@ def init_daily_log(data):
             "rescue_activated": False,
             "completed": False
         }
-        save_data(data)
     return data
 
 
@@ -238,7 +324,7 @@ def calculate_daily_score(log, week, track):
     score = 0
     max_score = 0
 
-    # Water (always counts) - 30 points
+    # Water - 30 points
     max_score += 30
     if log.get("water_liters", 0) >= 2:
         score += 15
@@ -247,7 +333,7 @@ def calculate_daily_score(log, week, track):
     if log.get("water_before_meals", 0) >= 3:
         score += 5
 
-    # Veggies (always counts) - 25 points
+    # Veggies - 25 points
     max_score += 25
     if log.get("veggies_50_percent", False):
         score += 25
@@ -259,9 +345,7 @@ def calculate_daily_score(log, week, track):
 
     # Eating window - 15 points
     max_score += 15
-    start = log.get("eating_window_start")
-    end = log.get("eating_window_end")
-    if start and end:
+    if log.get("eating_window_start") and log.get("eating_window_end"):
         score += 15
 
     # Fats limit - 15 points
@@ -269,10 +353,10 @@ def calculate_daily_score(log, week, track):
     if log.get("fats_count", 0) <= 3:
         score += 15
 
-    # Phase-specific penalties (only from week 3+)
+    # Phase penalties
     if phase in ["cleanse", "tracks"] and not log.get("treat_day", False):
         if log.get("sugar_flour", False):
-            score -= 20  # Penalty for forbidden foods
+            score -= 20
 
     return max(0, score), max_score
 
@@ -281,27 +365,26 @@ def show_rescue_wheels():
     """Display rescue protocol options"""
     st.markdown("""
     <div class="warning-box">
-        <h3>🆘 גלגלי הצלה - פרוטוקול חירום</h3>
+        <h4>🆘 גלגלי הצלה - פרוטוקול חירום</h4>
     </div>
     """, unsafe_allow_html=True)
-
-    st.markdown("#### בחר/י פעולת הצלה:")
 
     col1, col2, col3 = st.columns(3)
 
     with col1:
         if st.button("💧 הגבר מים", use_container_width=True):
-            st.success("✅ הוסף/י עוד 1-2 ליטר מים היום!")
-            st.balloons()
+            st.success("✅ הוסף/י עוד 1-2 ליטר מים!")
 
     with col2:
         if st.button("🥗 הגבר ירקות", use_container_width=True):
-            st.success("✅ הגדל/י את כמות הירקות ב-50%!")
+            st.success("✅ הגדל/י ירקות ב-50%!")
 
     with col3:
         if st.button("⏰ דחה ארוחה", use_container_width=True):
-            st.success("✅ מחר דחה/י את הארוחה הראשונה ב-1-3 שעות!")
+            st.success("✅ מחר דחה/י ארוחה ראשונה!")
 
+
+# ===== UI SCREENS =====
 
 def show_onboarding(data):
     """Show onboarding screen for new users"""
@@ -328,18 +411,19 @@ def show_onboarding(data):
             "מסלול",
             options=["fast", "cleanse", "moderate"],
             format_func=lambda x: {
-                "fast": "🚀 מסלול מהיר - עדשים בלבד, 2 ארוחות פינוק בשבוע",
-                "cleanse": "✨ מסלול ניקוי - קטניות + קינואה/כוסמת, 1 ארוחת פינוק + פירות",
-                "moderate": "🍚 מסלול מתון - אורז/תפו\"א פעם ביום, 1 ארוחת פינוק"
+                "fast": "🚀 מסלול מהיר - עדשים בלבד, 2 ארוחות פינוק",
+                "cleanse": "✨ מסלול ניקוי - קטניות + קינואה, 1 ארוחת פינוק",
+                "moderate": "🍚 מסלול מתון - אורז/תפו\"א פעם ביום"
             }.get(x),
             label_visibility="collapsed"
         )
 
-    if st.button("🚀 התחל מסע!", use_container_width=True):
+    if st.button("🚀 התחל מסע!", use_container_width=True, type="primary"):
         data["user_settings"]["current_week"] = week
         data["user_settings"]["track"] = track
         data["user_settings"]["start_date"] = get_today_key()
-        save_data(data)
+        save_gist_data(data)
+        st.session_state["app_data"] = data
         st.rerun()
 
 
@@ -381,7 +465,7 @@ def show_daily_tracking(data):
 
     if treat_day != log.get("treat_day"):
         log["treat_day"] = treat_day
-        save_data(data)
+        save_gist_data(data)
 
     if treat_day:
         st.markdown("""
@@ -401,7 +485,6 @@ def show_daily_tracking(data):
     </div>
     """, unsafe_allow_html=True)
 
-    # Water liters
     water_col1, water_col2 = st.columns([2, 2])
     with water_col1:
         water_liters = st.number_input(
@@ -423,9 +506,9 @@ def show_daily_tracking(data):
 
     if water_liters != log.get("water_liters"):
         log["water_liters"] = water_liters
-        save_data(data)
+        save_gist_data(data)
 
-    # Water before meals button
+    # Water before meals
     st.markdown("##### 🥤 2 כוסות לפני ארוחה:")
     water_before = log.get("water_before_meals", 0)
 
@@ -433,31 +516,26 @@ def show_daily_tracking(data):
     with wcol1:
         if st.button("➕", key="add_water", use_container_width=True):
             log["water_before_meals"] = min(water_before + 1, 6)
-            save_data(data)
+            save_gist_data(data)
             st.rerun()
     with wcol2:
         if st.button("➖", key="sub_water", use_container_width=True):
             log["water_before_meals"] = max(water_before - 1, 0)
-            save_data(data)
+            save_gist_data(data)
             st.rerun()
     with wcol3:
         st.markdown(f"**{water_before}/3** ארוחות")
     with wcol4:
-        if water_before >= 3:
-            st.markdown("✅")
-        else:
-            st.markdown("⏳")
+        st.markdown("✅" if water_before >= 3 else "⏳")
 
     # ===== NUTRITION TRACKING =====
     st.markdown("---")
     st.markdown("## 🥗 תזונה - ירקות וחלבון")
 
-    # Valid veggies info
     with st.expander("📋 רשימת ירקות מנקים"):
         st.markdown(", ".join(CLEANING_VEGGIES))
         st.markdown("⚠️ **לא נכללים:** תפוח אדמה, בטטה")
 
-    # Veggies checkbox
     veggies = st.checkbox(
         "🥒 אכלתי 50% ירקות מנקים לפחות ב-2 ארוחות",
         value=log.get("veggies_50_percent", False),
@@ -465,9 +543,8 @@ def show_daily_tracking(data):
     )
     if veggies != log.get("veggies_50_percent"):
         log["veggies_50_percent"] = veggies
-        save_data(data)
+        save_gist_data(data)
 
-    # Protein checkbox
     protein = st.checkbox(
         "🍗 כללתי חלבון בכל ארוחה",
         value=log.get("protein_every_meal", False),
@@ -475,7 +552,7 @@ def show_daily_tracking(data):
     )
     if protein != log.get("protein_every_meal"):
         log["protein_every_meal"] = protein
-        save_data(data)
+        save_gist_data(data)
 
     # ===== EATING WINDOW =====
     st.markdown("---")
@@ -484,26 +561,18 @@ def show_daily_tracking(data):
 
     ew_col1, ew_col2 = st.columns(2)
     with ew_col1:
-        start_time = st.time_input(
-            "ארוחה ראשונה",
-            value=None,
-            key="eating_start"
-        )
+        start_time = st.time_input("ארוחה ראשונה", value=None, key="eating_start")
     with ew_col2:
-        end_time = st.time_input(
-            "ארוחה אחרונה",
-            value=None,
-            key="eating_end"
-        )
+        end_time = st.time_input("ארוחה אחרונה", value=None, key="eating_end")
 
     if start_time:
         log["eating_window_start"] = start_time.strftime("%H:%M")
+        save_gist_data(data)
     if end_time:
         log["eating_window_end"] = end_time.strftime("%H:%M")
-    save_data(data)
+        save_gist_data(data)
 
     if start_time and end_time:
-        # Calculate window
         start_dt = datetime.combine(datetime.today(), start_time)
         end_dt = datetime.combine(datetime.today(), end_time)
         if end_dt < start_dt:
@@ -532,7 +601,7 @@ def show_daily_tracking(data):
     with fat_col1:
         if st.button("➖", key="sub_fat", use_container_width=True):
             log["fats_count"] = max(log.get("fats_count", 0) - 1, 0)
-            save_data(data)
+            save_gist_data(data)
             st.rerun()
     with fat_col2:
         fats = log.get("fats_count", 0)
@@ -542,7 +611,7 @@ def show_daily_tracking(data):
     with fat_col3:
         if st.button("➕", key="add_fat", use_container_width=True):
             log["fats_count"] = log.get("fats_count", 0) + 1
-            save_data(data)
+            save_gist_data(data)
             st.rerun()
 
     # ===== PHASE-SPECIFIC CONTENT =====
@@ -552,22 +621,23 @@ def show_daily_tracking(data):
         st.markdown("""
         <div class="info-box">
             <h4>🌊 שלב ההצפה (שבועות 1-2)</h4>
-            <p>התמקד/י במים וירקות בלבד!</p>
-            <p>אין הגבלות מזון - רק תתחיל/י להציף 💧</p>
+            <p>התמקד/י במים וירקות בלבד! אין הגבלות מזון.</p>
         </div>
         """, unsafe_allow_html=True)
 
-        # Optional sugar/flour logging (no penalty)
-        st.checkbox("📝 אכלתי סוכר/קמח (לתיעוד בלבד)",
-                   value=log.get("sugar_flour", False),
-                   key="sugar_flour_flood")
+        sugar_flour = st.checkbox("📝 אכלתי סוכר/קמח (לתיעוד בלבד)",
+                                  value=log.get("sugar_flour", False),
+                                  key="sugar_flour_flood")
+        if sugar_flour != log.get("sugar_flour"):
+            log["sugar_flour"] = sugar_flour
+            save_gist_data(data)
 
     elif phase == "cleanse":
         st.markdown("""
         <div class="warning-box">
             <h4>✨ שלב הניקוי (שבועות 3-7)</h4>
-            <p><strong>אסור:</strong> סוכר, דבש, סילאן, קמח, פסטה, אורז, תירס, תפו"א</p>
-            <p><strong>פחמימות לפטין מותרות:</strong> עדשים, חומוס, שעועית, קינואה, כוסמת</p>
+            <p><strong>אסור:</strong> סוכר, דבש, קמח, פסטה, אורז, תירס, תפו"א</p>
+            <p><strong>מותר:</strong> עדשים, חומוס, שעועית, קינואה, כוסמת</p>
         </div>
         """, unsafe_allow_html=True)
 
@@ -579,44 +649,34 @@ def show_daily_tracking(data):
             )
             if sugar_flour != log.get("sugar_flour"):
                 log["sugar_flour"] = sugar_flour
-                save_data(data)
+                save_gist_data(data)
                 if sugar_flour:
                     st.warning("אל דאגה! התקדמות לא שלמות. מחר יום חדש! 💪")
 
     elif phase == "tracks":
         st.markdown("### 🛤️ המסלול שלך")
 
-        # Show track info
         if track == "fast":
             st.markdown("""
             <div class="info-box">
                 <h4>🚀 מסלול מהיר</h4>
-                <p>✅ מותר: עדשים בלבד</p>
-                <p>🎉 2 ארוחות פינוק בשבוע</p>
+                <p>✅ מותר: עדשים בלבד | 🎉 2 ארוחות פינוק בשבוע</p>
             </div>
             """, unsafe_allow_html=True)
-            max_treats = 2
         elif track == "cleanse":
             st.markdown("""
             <div class="info-box">
                 <h4>✨ מסלול ניקוי</h4>
-                <p>✅ מותר: קטניות + קינואה/כוסמת/שיבולת שועל</p>
-                <p>🎉 1 ארוחת פינוק + פירות נוספים</p>
+                <p>✅ מותר: קטניות + קינואה/כוסמת | 🎉 1 ארוחת פינוק + פירות</p>
             </div>
             """, unsafe_allow_html=True)
-            max_treats = 1
-        else:  # moderate
+        else:
             st.markdown("""
             <div class="info-box">
                 <h4>🍚 מסלול מתון</h4>
-                <p>✅ מותר: אורז/תפו"א פעם ביום</p>
-                <p>🎉 1 ארוחת פינוק בשבוע</p>
+                <p>✅ מותר: אורז/תפו"א פעם ביום | 🎉 1 ארוחת פינוק</p>
             </div>
             """, unsafe_allow_html=True)
-            max_treats = 1
-
-        # Treat meals counter (weekly)
-        st.markdown(f"##### 🍰 ארוחות פינוק השבוע: {log.get('treat_meals_used', 0)}/{max_treats}")
 
         if not log.get("treat_day"):
             sugar_flour = st.checkbox(
@@ -626,12 +686,11 @@ def show_daily_tracking(data):
             )
             if sugar_flour != log.get("sugar_flour"):
                 log["sugar_flour"] = sugar_flour
-                save_data(data)
+                save_gist_data(data)
 
     # ===== RESCUE WHEELS =====
     st.markdown("---")
 
-    # Show rescue wheels if score is low or user wants
     if score < max_score * 0.6 or log.get("sugar_flour"):
         show_rescue_wheels()
     else:
@@ -645,17 +704,17 @@ def show_daily_tracking(data):
         "הערות ליום",
         value=log.get("notes", ""),
         label_visibility="collapsed",
-        placeholder="רשום/י כאן הערות, תובנות או תחושות..."
+        placeholder="רשום/י הערות, תובנות או תחושות..."
     )
     if notes != log.get("notes"):
         log["notes"] = notes
-        save_data(data)
+        save_gist_data(data)
 
-    # ===== COMPLETE DAY BUTTON =====
+    # ===== COMPLETE DAY =====
     st.markdown("---")
     if st.button("✅ סיים יום", use_container_width=True, type="primary"):
         log["completed"] = True
-        save_data(data)
+        save_gist_data(data)
 
         if score >= max_score * 0.8:
             st.balloons()
@@ -663,7 +722,7 @@ def show_daily_tracking(data):
         elif score >= max_score * 0.6:
             st.success("👍 יום טוב! יש מקום לשיפור קטן")
         else:
-            st.info("💪 כל יום הוא הזדמנות חדשה! התקדמות, לא שלמות!")
+            st.info("💪 כל יום הוא הזדמנות חדשה!")
 
 
 def show_history(data):
@@ -675,20 +734,17 @@ def show_history(data):
         st.info("אין עדיין היסטוריה")
         return
 
-    # Sort by date descending
     sorted_dates = sorted(logs.keys(), reverse=True)
 
-    for date_str in sorted_dates[:14]:  # Last 14 days
+    for date_str in sorted_dates[:14]:
         log = logs[date_str]
         week = data["user_settings"]["current_week"]
         track = data["user_settings"].get("track")
         score, max_score = calculate_daily_score(log, week, track)
 
-        # Format date
         date_obj = datetime.strptime(date_str, "%Y-%m-%d")
         date_display = date_obj.strftime("%d/%m/%Y")
 
-        # Status emoji
         if score >= max_score * 0.8:
             status = "🌟"
         elif score >= max_score * 0.6:
@@ -702,7 +758,7 @@ def show_history(data):
             st.markdown(f"💧 מים: {log.get('water_liters', 0)} ליטר")
             st.markdown(f"🥤 מים לפני ארוחות: {log.get('water_before_meals', 0)}/3")
             st.markdown(f"🥗 ירקות 50%: {'✅' if log.get('veggies_50_percent') else '❌'}")
-            st.markdown(f"🍗 חלבון בכל ארוחה: {'✅' if log.get('protein_every_meal') else '❌'}")
+            st.markdown(f"🍗 חלבון: {'✅' if log.get('protein_every_meal') else '❌'}")
             st.markdown(f"🥑 שומנים: {log.get('fats_count', 0)} כפות")
             if log.get("notes"):
                 st.markdown(f"📝 {log.get('notes')}")
@@ -714,7 +770,6 @@ def show_settings(data):
 
     settings = data["user_settings"]
 
-    # Week selection
     new_week = st.selectbox(
         "שבוע נוכחי",
         options=list(range(1, 14)),
@@ -722,19 +777,16 @@ def show_settings(data):
         format_func=lambda x: f"שבוע {x}"
     )
 
-    # Track selection (only for week 9+)
     new_track = settings.get("track")
     if new_week >= 9:
         st.markdown("#### 🛤️ מסלול:")
+        track_options = ["fast", "cleanse", "moderate"]
+        current_index = track_options.index(settings.get("track") or "fast")
         new_track = st.radio(
             "מסלול",
-            options=["fast", "cleanse", "moderate"],
-            index=["fast", "cleanse", "moderate"].index(settings.get("track") or "fast"),
-            format_func=lambda x: {
-                "fast": "🚀 מהיר",
-                "cleanse": "✨ ניקוי",
-                "moderate": "🍚 מתון"
-            }.get(x),
+            options=track_options,
+            index=current_index,
+            format_func=lambda x: {"fast": "🚀 מהיר", "cleanse": "✨ ניקוי", "moderate": "🍚 מתון"}.get(x),
             label_visibility="collapsed",
             horizontal=True
         )
@@ -742,28 +794,30 @@ def show_settings(data):
     if st.button("💾 שמור הגדרות", use_container_width=True):
         settings["current_week"] = new_week
         settings["track"] = new_track if new_week >= 9 else None
-        save_data(data)
+        save_gist_data(data)
         st.success("✅ ההגדרות נשמרו!")
         st.rerun()
 
     st.markdown("---")
 
-    # Reset data
-    st.markdown("### 🗑️ איפוס נתונים")
-    if st.button("🔄 התחל מחדש", use_container_width=True):
-        if st.session_state.get("confirm_reset"):
-            os.remove(DATA_FILE) if DATA_FILE.exists() else None
-            st.session_state.clear()
-            st.rerun()
-        else:
-            st.session_state["confirm_reset"] = True
-            st.warning("לחץ/י שוב לאישור איפוס")
+    # Logout
+    if st.button("🚪 התנתק", use_container_width=True):
+        st.session_state.authenticated = False
+        st.rerun()
 
 
 def main():
     """Main application entry point"""
-    # Load data
-    data = load_data()
+
+    # Check authentication
+    if not check_password():
+        return
+
+    # Load data from Gist
+    if "app_data" not in st.session_state:
+        st.session_state["app_data"] = get_gist_data()
+
+    data = st.session_state["app_data"]
 
     # Check if onboarding needed
     if data["user_settings"].get("start_date") is None:
@@ -782,7 +836,7 @@ def main():
     with tabs[2]:
         show_settings(data)
 
-    # Motivational footer
+    # Footer
     st.markdown("---")
     st.markdown("""
     <div style="text-align: center; color: #666; font-size: 0.9rem;">
