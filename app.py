@@ -2,81 +2,109 @@ import streamlit as st
 import json
 import requests
 
+# הגדרות דף Mobile-First
 st.set_page_config(page_title="LeptinVibe", layout="wide")
 
-# --- אימות סיסמה ---
-if "authenticated" not in st.session_state:
-    st.session_state.authenticated = False
+# --- מנגנון אימות סיסמה מה-Secrets ---
+def check_password():
+    if st.session_state.get("authenticated", False):
+        return True
+    
+    st.title("🥗 LeptinVibe")
+    # שליפת הסיסמה מה-Secrets (הסיסמה שהגדרת: wTn6bLdrZT7gEHu)
+    correct_password = st.secrets.get("PASSWORD", "wTn6bLdrZT7gEHu")
+    
+    password_input = st.text_input("סיסמה", type="password", key="password_input")
 
-if not st.session_state.authenticated:
-    st.title("🔐 LeptinVibe Login")
-    pwd = st.text_input("סיסמה", type="password")
-    if st.button("כניסה"):
-        if pwd == st.secrets.get("PASSWORD", "wTn6bLdrZT7gEHu"):
+    if st.button("כניסה", use_container_width=True):
+        if password_input == correct_password:
             st.session_state.authenticated = True
             st.rerun()
-        else: st.error("סיסמה שגויה")
+        else:
+            st.error("סיסמה שגויה")
+
+    st.markdown("---")
+    st.markdown("""
+    <div style="text-align: center; color: #666; font-size: 0.8rem;">
+        💧 הצפת לפטין | התקדמות, לא שלמות
+    </div>
+    """, unsafe_allow_html=True)
+    return False
+
+if not check_password():
     st.stop()
 
-# --- טעינת נתונים מרוחקת ---
-@st.cache_data(ttl=60)
-def load_all_data():
+# --- טעינת נתונים מה-Gist ---
+@st.cache_data(ttl=300)
+def load_data_from_gist():
     try:
-        headers = {"Authorization": f"token {st.secrets['GITHUB_TOKEN']}"}
-        response = requests.get(f"https://api.github.com/gists/{st.secrets['GIST_ID']}", headers=headers)
+        token = st.secrets["GITHUB_TOKEN"]
+        gist_id = st.secrets["GIST_ID"]
+        headers = {"Authorization": f"token {token}"}
+        url = f"https://api.github.com/gists/{gist_id}"
         
-        if response.status_code != 200:
-            st.error(f"GitHub Error {response.status_code}: {response.text}")
-            return None, None, None
-            
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
         files = response.json().get('files', {})
         
-        # בדיקה אם שמות הקבצים קיימים ב-Gist
-        # שים לב: שמות הקבצים ב-Gist חייבים להיות בול כמו כאן
-        if 'recapise.json' not in files or 'vibes.json' not in files:
-            st.error(f"קבצים חסרים ב-Gist! נמצאו רק: {list(files.keys())}")
-            return None, None, None
-
+        # טעינת שלושת הקבצים שלך
         recipes = json.loads(files['recapise.json']['content'])['recipes']
         not_allowed = json.loads(files['not allowed.json']['content'])
         vibes = json.loads(files['vibes.json']['content'])['vibes']
+        
         return recipes, not_allowed, vibes
     except Exception as e:
-        st.error(f"שגיאה כללית: {str(e)}")
+        st.error(f"שגיאה בטעינת הנתונים: {e}")
         return None, None, None
 
-recipes_data, not_allowed, vibes = load_all_data()
+recipes, not_allowed, vibes = load_data_from_gist()
 
-# --- מניעת קריסה אם הנתונים לא נטענו ---
 if not vibes:
-    st.warning("המערכת מחכה לנתונים מ-GitHub...")
     st.stop()
 
-# --- המשך הלוגיקה (Vibes וסינון) ---
+# --- סינון מחמיר (חוקי הלפטין) ---
+def is_approved(recipe, forbidden_data):
+    # מניעת קמחים, סוכר ורכיבים טחונים
+    forbidden_list = []
+    for cat in forbidden_data['forbidden_items_leptin_method'].values():
+        forbidden_list.extend([i['name'].lower() for i in cat['items']])
+    
+    ing_text = " ".join(recipe['ingredients']).lower()
+    return not any(f in ing_text for f in forbidden_list)
+
+# --- ממשק המשתמש ---
 st.header("מה ה-Vibe שלך?")
 vibe_names = [v['display_name'] for v in vibes]
 selected_vibe_name = st.radio("בחר תחושה:", vibe_names, horizontal=True)
 selected_vibe = next(v for v in vibes if v['display_name'] == selected_vibe_name)
 
-# סינון מחמיר (קמח/סוכר/פירות אסורים)
-forbidden = []
-for cat in not_allowed['forbidden_items_leptin_method'].values():
-    forbidden.extend([i['name'].lower() for i in cat['items']])
-
-def is_approved(recipe):
-    ing_text = " ".join(recipe['ingredients']).lower()
-    return not any(f in ing_text for f in forbidden)
-
-approved_recipes = [r for r in recipes_data if str(r['id']) in selected_vibe['recipe_ids'] and is_approved(r)]
+# סינון והצגה
+approved_recipes = [r for r in recipes if str(r['id']) in selected_vibe['recipe_ids'] and is_approved(r, not_allowed)]
 
 for recipe in approved_recipes:
     with st.container(border=True):
         st.subheader(recipe['name'])
-        # מד צלחת 50/25/25
-        st.write("🟢 ירקות מנקים: 50% | 🔴 חלבון: 25% | 🟡 פחמימה: 25%")
-        st.progress(0.5) 
+        st.caption(f"📅 {recipe['diet_phase']}")
+        
+        # Visual Meter (50/25/25)
+        st.write("**איזון צלחת לפטיני:**")
+        is_main = "מנה עיקרית" in recipe['category']
+        
+        if is_main:
+            st.write("🟢 50% ירקות מנקים | 🔴 25% חלבון | 🟡 25% פחמימה")
+            st.progress(0.5)
+            st.warning("זכור להוסיף 50% ירקות מנקים טריים!")
+        else:
+            st.write("🟢 100% ירקות מנקים")
+            st.progress(1.0)
+            st.success("מעולה! זה ירק מנקה חופשי.")
+
         with st.expander("רכיבים והוראות"):
-            st.write(recipe['instructions'])
+            for ing in recipe['ingredients']:
+                st.write(f"• {ing}")
+            st.write(f"**הוראות:** {recipe['instructions']}")
+            if 'notes' in recipe:
+                st.info(recipe['notes'])
 
 st.divider()
-st.caption("💧 הצפת לפטין | התקדמות, לא שלמות")
+st.link_button("חיפוש השראה נוספת ב-Tasty", "https://tasty.co/ingredient")
