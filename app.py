@@ -72,12 +72,24 @@ def is_approved_by_leptin(recipe):
     ingredients_str = " ".join(recipe['ingredients']).lower()
     return not any(item in ingredients_str for item in forbidden_items)
 
-# --- ממשק ה-App ---
-st.header("מה ה-Vibe שלך?")
+# --- ממשק בחירת ה-Vibe ---
+st.subheader("מה ה-Vibe שלך?")
 
-# סליידר בחירה (Pills)
+# יצירת רשימת שמות ה-Vibes
 vibe_display_names = [v['display_name'] for v in vibes]
-selected_vibe_name = st.pills("בחר תחושה:", vibe_display_names, index=0)
+
+# שימוש ב-st.radio עם אופציה אופקית - יציב יותר בנייד ומונע את שגיאת ה-TypeError
+selected_vibe_name = st.radio(
+    "בחר תחושה:", 
+    options=vibe_display_names, 
+    index=0, 
+    horizontal=True
+)
+
+# שליפת ה-Vibe הנבחר
+selected_vibe = next(v for v in vibes if v['display_name'] == selected_vibe_name)
+
+
 selected_vibe = next(v for v in vibes if v['display_name'] == selected_vibe_name)
 
 # סינון מתכונים
