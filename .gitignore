@@ -2,6 +2,12 @@
 .streamlit/secrets.toml
 secrets.toml
 
+# Claude Code local settings (may contain tokens)
+.claude/settings.local.json
+
+# Temp files
+gist_temp.json
+
 # Local data
 leptin_data.json
 

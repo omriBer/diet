@@ -9,10 +9,9 @@ st.set_page_config(page_title="LeptinVibe", layout="wide")
 def check_password():
     if st.session_state.get("authenticated", False):
         return True
-    
+
     st.title("🥗 LeptinVibe")
-    # שליפת הסיסמה מה-Secrets (הסיסמה שהגדרת: wTn6bLdrZT7gEHu)
-    correct_password = st.secrets.get("PASSWORD", "wTn6bLdrZT7gEHu")
+    correct_password = st.secrets["PASSWORD"]
     
     password_input = st.text_input("סיסמה", type="password", key="password_input")
 
@@ -59,18 +58,19 @@ def load_data_from_gist():
 
 recipes, not_allowed, vibes = load_data_from_gist()
 
-if not vibes:
+if not recipes or not not_allowed or not vibes:
     st.stop()
 
 # --- סינון מחמיר (חוקי הלפטין) ---
 def is_approved(recipe, forbidden_data):
-    # מניעת קמחים, סוכר ורכיבים טחונים
-    forbidden_list = []
+    # איסוף מילות מפתח בעברית לסינון
+    forbidden_keywords = []
     for cat in forbidden_data['forbidden_items_leptin_method'].values():
-        forbidden_list.extend([i['name'].lower() for i in cat['items']])
-    
-    ing_text = " ".join(recipe['ingredients']).lower()
-    return not any(f in ing_text for f in forbidden_list)
+        for item in cat['items']:
+            forbidden_keywords.extend(item.get('hebrew_keywords', []))
+
+    ing_text = " ".join(recipe['ingredients'])
+    return not any(kw in ing_text for kw in forbidden_keywords)
 
 # --- ממשק המשתמש ---
 st.header("מה ה-Vibe שלך?")

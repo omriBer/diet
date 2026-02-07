@@ -1,4 +1,3 @@
-```json
 {
   "forbidden_items_leptin_method": {
     "flours_and_ground_foods": {
@@ -6,38 +5,47 @@
       "items": [
         {
           "name": "All purpose flour",
+          "hebrew_keywords": ["קמח לבן", "קמח חיטה", "קמח רגיל"],
           "reason": "קמח חיטה/לבן - מעובד, מקפיץ אינסולין."
         },
         {
           "name": "Almond meal",
+          "hebrew_keywords": ["קמח שקדים", "שקדים טחונים"],
           "reason": "מזון טחון - אסור בשלב הניקוי (שקדים שלמים מותרים כשומן)."
         },
         {
           "name": "Bread flour",
+          "hebrew_keywords": ["קמח לחם"],
           "reason": "קמח חיטה - אסור."
         },
         {
           "name": "Cake flour",
+          "hebrew_keywords": ["קמח עוגה", "קמח עוגות"],
           "reason": "קמח מעובד - אסור."
         },
         {
           "name": "Chickpea flour",
+          "hebrew_keywords": ["קמח חומוס"],
           "reason": "קמח קטניות - אסור כי הוא טחון (גרגירי חומוס שלמים מותרים)."
         },
         {
           "name": "Corn flour",
+          "hebrew_keywords": ["קמח תירס"],
           "reason": "קמח עמילני - אסור."
         },
         {
           "name": "Cornmeal",
+          "hebrew_keywords": ["קמח תירס", "פולנטה"],
           "reason": "מזון טחון מתירס - אסור."
         },
         {
           "name": "Oat flour",
+          "hebrew_keywords": ["קמח שיבולת שועל"],
           "reason": "קמח שיבולת שועל - אסור כי הוא טחון (שיבולת שועל עבה שלמה מותרת במידה)."
         },
         {
           "name": "Self rising flour",
+          "hebrew_keywords": ["קמח תופח"],
           "reason": "קמח מעובד - אסור."
         }
       ]
@@ -47,30 +55,37 @@
       "items": [
         {
           "name": "Brown rice",
+          "hebrew_keywords": ["אורז"],
           "reason": "אורז (מכל סוג) אסור בשלב הניקוי."
         },
         {
           "name": "Corn kernel",
+          "hebrew_keywords": ["תירס"],
           "reason": "תירס נחשב פחמימה פשוטה יחסית ואסור בניקוי."
         },
         {
           "name": "Plantain",
+          "hebrew_keywords": ["פלנטיין"],
           "reason": "עמילני מאוד, דומה לבננה/תפוח אדמה."
         },
         {
           "name": "Potato",
+          "hebrew_keywords": ["תפוח אדמה", "תפוחי אדמה"],
           "reason": "תפוח אדמה אסור בשלב הניקוי."
         },
         {
           "name": "Sweet potato",
+          "hebrew_keywords": ["בטטה", "בטטות"],
           "reason": "בטטה אסורה בשלב הניקוי (מותרת רק במסלול מתון)."
         },
         {
           "name": "Whole grain",
+          "hebrew_keywords": ["דגנים", "חיטה", "שעורה"],
           "reason": "דגנים (חיטה, שעורה וכו') אסורים בניקוי."
         },
         {
           "name": "Beetroot",
+          "hebrew_keywords": ["סלק", "סלקים"],
           "reason": "סלק - מכיל סוכר רב יחסית, אסור בשלב הניקוי."
         }
       ]
@@ -80,22 +95,27 @@
       "items": [
         {
           "name": "Banana",
+          "hebrew_keywords": ["בננה", "בננות"],
           "reason": "ערך סוכרי גבוה - אסורה."
         },
         {
           "name": "Date",
+          "hebrew_keywords": ["תמר", "תמרים"],
           "reason": "תמרים אסורים לחלוטין (נחשבים סוכר)."
         },
         {
           "name": "Jackfruit",
+          "hebrew_keywords": ["ג'קפרוט"],
           "reason": "פרי עתיר סוכר/פחמימה - לא מומלץ בניקוי."
         },
         {
           "name": "Raisin",
+          "hebrew_keywords": ["צימוק", "צימוקים"],
           "reason": "צימוקים (וכל פרי יבש) אסורים בגלל ריכוז הסוכר."
         },
         {
           "name": "Cranberry",
+          "hebrew_keywords": ["חמוציות"],
           "reason": "לרוב מיובשות וממותקות. אם טריות - מותר, אך כברירת מחדל נחשב פרי יבש/מסוכר."
         }
       ]
@@ -105,18 +125,20 @@
       "items": [
         {
           "name": "Chocolate",
+          "hebrew_keywords": ["שוקולד"],
           "reason": "מכיל סוכר (קקאו טהור מותר)."
         },
         {
           "name": "Sriracha sauce",
+          "hebrew_keywords": ["סרירצ'ה"],
           "reason": "מכיל סוכר כרכיב מרכזי."
         },
         {
           "name": "Taco seasoning",
+          "hebrew_keywords": ["תיבול טאקו"],
           "reason": "תערובות מוכנות מכילות לרוב עמילן תירס וסוכר."
         }
       ]
     }
   }
 }
-```
