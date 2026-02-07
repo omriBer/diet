@@ -1,0 +1,14 @@
+{
+  "vibes": [
+    { "vibe_id": "fresh_morning", "display_name": "בוקר של התחדשות", "icon": "🌱", "recipe_ids": ["2", "21", "27"] },
+    { "vibe_id": "meat_lover", "display_name": "קרניבור בנשמה", "icon": "🦁", "recipe_ids": ["6", "7", "8"] },
+    { "vibe_id": "shabbat_spirit", "display_name": "ניחוח של שבת", "icon": "🕯️", "recipe_ids": ["4", "11", "18"] },
+    { "vibe_id": "sweet_emergency", "display_name": "משבר מתוק קל", "icon": "🍫", "recipe_ids": ["13", "16", "23"] },
+    { "vibe_id": "light_breeze", "display_name": "קליל ולא מכביד", "icon": "🍃", "recipe_ids": ["9", "10", "12"] },
+    { "vibe_id": "after_workout", "display_name": "בוסט חלבון שאחרי", "icon": "💪", "recipe_ids": ["14", "15", "20"] },
+    { "vibe_id": "lazy_dinner", "display_name": "עייפות של יום ארוך", "icon": "🌙", "recipe_ids": ["3", "17", "30"] },
+    { "vibe_id": "spicy_kick", "display_name": "בא לי פיקנטי", "icon": "🌶️", "recipe_ids": ["7", "19", "28"] },
+    { "vibe_id": "crunchy_fun", "display_name": "משהו קראנצ'י בפה", "icon": "🥕", "recipe_ids": ["10", "11", "29"] },
+    { "vibe_id": "fancy_host", "display_name": "לארח בסטייל", "icon": "🍽️", "recipe_ids": ["4", "9", "11"] }
+  ]
+}

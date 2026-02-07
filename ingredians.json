@@ -1,0 +1,156 @@
+```json
+{
+  "leptin_pantry_essentials": {
+    "cleaning_vegetables": {
+      "description": "ירקות מנקים - בסיס הארוחה (50% מהצלחת). דלים בקלוריות ועשירים בסיבים.",
+      "items": [
+        { "id": "v1", "name": "מלפפון", "english_name": "Cucumber", "fresh": true },
+        { "id": "v2", "name": "עגבניה", "english_name": "Tomato", "fresh": true },
+        { "id": "v3", "name": "עגבניות שרי", "english_name": "Cherry Tomatoes", "fresh": true },
+        { "id": "v4", "name": "בצל", "english_name": "Onion", "type": ["לבן", "סגול", "ירוק"], "fresh": true },
+        { "id": "v5", "name": "פלפל", "english_name": "Bell Pepper", "type": ["אדום", "צהוב", "כתום", "ירוק"], "fresh": true },
+        { "id": "v6", "name": "כרוב", "english_name": "Cabbage", "type": ["לבן", "סגול"], "fresh": true },
+        { "id": "v7", "name": "כרובית", "english_name": "Cauliflower", "fresh": true, "frozen_available": true },
+        { "id": "v8", "name": "ברוקולי", "english_name": "Broccoli", "fresh": true, "frozen_available": true },
+        { "id": "v9", "name": "שעועית ירוקה/צהובה", "english_name": "Green/Yellow Beans", "fresh": true, "frozen_available": true, "note": "ירק מנקה (לא קטניה)" },
+        { "id": "v10", "name": "קישוא / זוקיני", "english_name": "Zucchini / Squash", "fresh": true },
+        { "id": "v11", "name": "חציל", "english_name": "Eggplant", "fresh": true },
+        { "id": "v12", "name": "פטריות", "english_name": "Mushrooms", "type": ["שמפיניון", "פורטובלו", "יער"], "fresh": true },
+        { "id": "v13", "name": "חסה", "english_name": "Lettuce", "type": ["ערבית", "אייסברג", "לבבות"], "fresh": true },
+        { "id": "v14", "name": "עלים ירוקים", "english_name": "Leafy Greens", "type": ["תרד", "קייל", "מנגולד", "רוקט", "בייבי"], "fresh": true },
+        { "id": "v15", "name": "עשבי תיבול", "english_name": "Herbs", "type": ["פטרוזיליה", "כוסברה", "נענע", "בזיליקום", "שמיר", "סלרי"], "fresh": true },
+        { "id": "v16", "name": "גזר", "english_name": "Carrot", "fresh": true },
+        { "id": "v17", "name": "קולורבי", "english_name": "Kohlrabi", "fresh": true },
+        { "id": "v18", "name": "צנונית", "english_name": "Radish", "fresh": true },
+        { "id": "v19", "name": "שומר", "english_name": "Fennel", "fresh": true },
+        { "id": "v20", "name": "דלעת / דלורית", "english_name": "Pumpkin / Butternut Squash", "fresh": true },
+        { "id": "v21", "name": "אספרגוס", "english_name": "Asparagus", "fresh": true },
+        { "id": "v22", "name": "ארטישוק", "english_name": "Artichoke", "fresh": true },
+        { "id": "v23", "name": "נבטים", "english_name": "Sprouts", "fresh": true },
+        { "id": "v24", "name": "לבבות דקל", "english_name": "Hearts of Palm", "form": ["שימורים"] },
+        { "id": "v25", "name": "במיה", "english_name": "Okra", "fresh": true, "frozen_available": true }
+      ]
+    },
+    "proteins": {
+      "description": "חלבונים מהחי ומהצומח. חובה בכל ארוחה. מחולק לרזה (מומלץ) ושמן (להמעיט).",
+      "meat_and_poultry": [
+        { "id": "pm1", "name": "חזה עוף", "english_name": "Chicken Breast", "fat_content": "רזה", "note": "מומלץ מאוד" },
+        { "id": "pm2", "name": "הודו (חזה/טחון)", "english_name": "Turkey (Breast/Minced)", "fat_content": "רזה" },
+        { "id": "pm3", "name": "בקר - כתף (נתח מס' 4/5)", "english_name": "Beef Shoulder", "fat_content": "רזה", "note": "מומלץ לטחינה" },
+        { "id": "pm4", "name": "בקר - סינטה", "english_name": "Sirloin", "fat_content": "רזה" },
+        { "id": "pm5", "name": "בקר - פילה", "english_name": "Beef Fillet", "fat_content": "רזה" },
+        { "id": "pm6", "name": "פרגית", "english_name": "Boneless Chicken Thigh (Pargit)", "fat_content": "בינוני/שמן", "note": "להמעיט בצריכה" },
+        { "id": "pm7", "name": "כרעיים עוף", "english_name": "Chicken Thighs/Drumsticks", "fat_content": "בינוני", "note": "עדיף ללא עור" },
+        { "id": "pm8", "name": "בשר טחון (רגיל)", "english_name": "Minced Meat (Regular)", "fat_content": "שמן", "note": "עדיף לבקש מהקצב נתח רזה ולטחון" },
+        { "id": "pm9", "name": "קבב / המבורגר", "english_name": "Kebab / Burger", "fat_content": "שמן", "note": "להמעיט בצריכה" },
+        { "id": "pm10", "name": "שווארמה", "english_name": "Shawarma", "fat_content": "שמן", "note": "להמעיט בצריכה" }
+      ],
+      "fish": [
+        { "id": "pf1", "name": "אמנון (מושט)", "english_name": "Tilapia", "fat_content": "רזה" },
+        { "id": "pf2", "name": "לברק", "english_name": "Sea Bass", "fat_content": "רזה" },
+        { "id": "pf3", "name": "דניס", "english_name": "Sea Bream (Gilt-head bream)", "fat_content": "בינוני/שמן" },
+        { "id": "pf4", "name": "בורי", "english_name": "Grey Mullet", "fat_content": "בינוני" },
+        { "id": "pf5", "name": "סלמון", "english_name": "Salmon", "fat_content": "שמן (בריא)", "note": "עשיר באומגה 3" },
+        { "id": "pf6", "name": "טונה (שימורים)", "english_name": "Canned Tuna", "type": ["במים (מומלץ)", "בשמן (לסנן)"] },
+        { "id": "pf7", "name": "פורל", "english_name": "Trout", "fat_content": "בינוני/שמן" },
+        { "id": "pf8", "name": "קוד (בקלה)", "english_name": "Cod", "fat_content": "רזה" },
+        { "id": "pf9", "name": "נסיכת הנילוס", "english_name": "Nile Perch", "fat_content": "שמן" },
+        { "id": "pf10", "name": "קרפיון", "english_name": "Carp", "fat_content": "בינוני" }
+      ],
+      "vegetarian_vegan": [
+        { "id": "pv1", "name": "ביצים", "english_name": "Eggs", "note": "חביתה, קשה, שקשוקה" },
+        { "id": "pv2", "name": "טופו", "english_name": "Tofu", "brands": ["Tnuva", "Wyler"], "note": "ללא סוכר" },
+        { "id": "pv3", "name": "סייטן", "english_name": "Seitan", "note": "חלבון חיטה" },
+        { "id": "pv4", "name": "אבקת חלבון", "english_name": "Protein Powder", "type": ["Whey", "Vegan"], "note": "בטעם טבעי או ממותק בסטיביה" }
+      ]
+    },
+    "leptin_carbs": {
+      "description": "פחמימות לפטיניות (בעיקר קטניות).",
+      "legumes": [
+        { "id": "c1", "name": "עדשים", "english_name": "Lentils", "type": ["Black", "Green", "Orange"] },
+        { "id": "c2", "name": "שעועית", "english_name": "Beans", "type": ["White", "Red", "Black", "Mung", "Black-eyed peas"] },
+        { "id": "c3", "name": "גרגירי חומוס", "english_name": "Chickpeas", "note": "לא ממרח קנוי" },
+        { "id": "c4", "name": "אפונה", "english_name": "Peas" },
+        { "id": "c5", "name": "אדממה (פולי סויה)", "english_name": "Edamame (Soy beans)" },
+        { "id": "c6", "name": "פול", "english_name": "Fava Beans" },
+        { "id": "c7", "name": "תורמוס", "english_name": "Lupine Beans" }
+      ],
+      "other_carbs": [
+        { "id": "c8", "name": "קינואה", "english_name": "Quinoa", "note": "מותרת בניקוי" },
+        { "id": "c9", "name": "כוסמת", "english_name": "Buckwheat", "type": ["Green", "Brown"] },
+        { "id": "c10", "name": "שיבולת שועל (עבה)", "english_name": "Rolled Oats (Thick)", "limit": "עד 4 כפות ביום" },
+        { "id": "c11", "name": "ארטישוק ירושלמי", "english_name": "Jerusalem Artichoke" },
+        { "id": "c12", "name": "בטטה", "english_name": "Sweet Potato", "note": "אסורה בניקוי (שבועות 3-8), מותרת במסלול מתון" },
+        { "id": "c13", "name": "תפוח אדמה", "english_name": "Potato", "note": "אסור בניקוי, מותר במסלול מתון" },
+        { "id": "c14", "name": "אורז", "english_name": "Rice", "type": ["Basmati", "Brown", "White"], "note": "אסור בניקוי, מותר במסלול מתון" }
+      ]
+    },
+    "dairy_and_alternatives": {
+      "description": "מוצרי חלב ותחליפים - ללא סוכר.",
+      "items": [
+        { "id": "d1", "name": "יוגורט חלבון (PRO/GO)", "english_name": "Protein Yogurt", "fat": "0%-3%", "note": "ללא סוכר" },
+        { "id": "d2", "name": "יוגורט ביו טבעי", "english_name": "Bio Yogurt", "fat": "1.5%-3%" },
+        { "id": "d3", "name": "יוגורט עיזים/כבשים", "english_name": "Goat/Sheep Yogurt" },
+        { "id": "d4", "name": "קוטג'", "english_name": "Cottage Cheese", "fat": "3%-5%" },
+        { "id": "d5", "name": "גבינה לבנה", "english_name": "White Cheese (Soft)", "fat": "3%-5%" },
+        { "id": "d6", "name": "גבינה בולגרית / פטה", "english_name": "Feta / Bulgarian Cheese", "fat": "5%" },
+        { "id": "d7", "name": "ריקוטה", "english_name": "Ricotta", "fat": "5%" },
+        { "id": "d8", "name": "משקה שקדים", "english_name": "Almond Milk", "note": "Unsweetened" },
+        { "id": "d9", "name": "משקה סויה", "english_name": "Soy Milk", "note": "Unsweetened" }
+      ]
+    },
+    "fats": {
+      "description": "שומנים איכותיים - מוגבל ל 2-3 כפות ביום.",
+      "items": [
+        { "id": "f1", "name": "שמן זית", "english_name": "Olive Oil" },
+        { "id": "f2", "name": "טחינה גולמית", "english_name": "Raw Tahini" },
+        { "id": "f3", "name": "אבוקדו", "english_name": "Avocado", "measure": "Half medium avocado = 1 fat portion" },
+        { "id": "f4", "name": "חמאת בוטנים טבעית", "english_name": "Natural Peanut Butter" },
+        { "id": "f5", "name": "חמאת שקדים", "english_name": "Almond Butter" },
+        { "id": "f6", "name": "שמן קוקוס / קרם קוקוס", "english_name": "Coconut Oil / Cream" },
+        { "id": "f7", "name": "אגוזי מלך", "english_name": "Walnuts" },
+        { "id": "f8", "name": "שקדים", "english_name": "Almonds", "state": "Not roasted" },
+        { "id": "f9", "name": "זיתים", "english_name": "Olives" }
+      ]
+    },
+    "fruits": {
+      "description": "פירות - מנת פרי אחת ביום (או לפי מסלול).",
+      "items": [
+        { "id": "fr1", "name": "תפוח", "english_name": "Apple", "type": ["Granny Smith", "Pink Lady"] },
+        { "id": "fr2", "name": "אגס", "english_name": "Pear" },
+        { "id": "fr3", "name": "תפוז", "english_name": "Orange" },
+        { "id": "fr4", "name": "קלמנטינה", "english_name": "Clementine" },
+        { "id": "fr5", "name": "אפרסק / נקטרינה", "english_name": "Peach / Nectarine" },
+        { "id": "fr6", "name": "שזיף", "english_name": "Plum" },
+        { "id": "fr7", "name": "קיווי", "english_name": "Kiwi" },
+        { "id": "fr8", "name": "מלון", "english_name": "Melon" },
+        { "id": "fr9", "name": "אבטיח", "english_name": "Watermelon" },
+        { "id": "fr10", "name": "מנגו", "english_name": "Mango" },
+        { "id": "fr11", "name": "תות שדה", "english_name": "Strawberry", "limit": "Unlimited/Free" },
+        { "id": "fr12", "name": "פירות יער", "english_name": "Forest Berries", "limit": "Unlimited/Free" }
+      ]
+    },
+    "pantry_and_spices": {
+      "description": "מוצרי בסיס ותיבול.",
+      "items": [
+        { "id": "s1", "name": "רסק/מחית עגבניות", "english_name": "Tomato Paste/Puree", "note": "No added sugar (Mutti)" },
+        { "id": "s2", "name": "מלח גס/הימלאיה", "english_name": "Coarse/Himalayan Salt" },
+        { "id": "s3", "name": "פלפל שחור", "english_name": "Black Pepper" },
+        { "id": "s4", "name": "כמון", "english_name": "Cumin" },
+        { "id": "s5", "name": "פפריקה", "english_name": "Paprika", "type": ["Sweet", "Hot", "Smoked"] },
+        { "id": "s6", "name": "כורכום", "english_name": "Turmeric" },
+        { "id": "s7", "name": "קינמון", "english_name": "Cinnamon" },
+        { "id": "s8", "name": "זעתר", "english_name": "Za'atar" },
+        { "id": "s9", "name": "סטיביה", "english_name": "Stevia" },
+        { "id": "s10", "name": "דבש", "english_name": "Honey", "limit": "1-2 tsp/day" },
+        { "id": "s11", "name": "קקאו", "english_name": "Cocoa Powder", "note": "Unsweetened" },
+        { "id": "s12", "name": "חומץ תפוחים", "english_name": "Apple Cider Vinegar" },
+        { "id": "s13", "name": "חרדל דיז'ון", "english_name": "Dijon Mustard", "note": "Smooth/Grainy, no sugar" },
+        { "id": "s14", "name": "רוטב סויה", "english_name": "Soy Sauce", "note": "Gluten free/No sugar" },
+        { "id": "s15", "name": "אבקת אפייה", "english_name": "Baking Powder" },
+        { "id": "s16", "name": "תמצית וניל", "english_name": "Vanilla Extract" }
+      ]
+    }
+  }
+}
+```
